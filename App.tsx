@@ -1,20 +1,76 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { JSX, useEffect, useState } from "react";
+import { View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Routes from "@routes/index";
+import SplashScreen from "@screens/intro/Splash/view";
+import "./src/common/styles/global.css";
+import * as FontPoppins from "@expo-google-fonts/poppins";
+import * as FontRubik from "@expo-google-fonts/rubik";
+import {
+  setBackgroundColorAsync,
+  setButtonStyleAsync,
+} from "expo-navigation-bar";
+import { colors } from "@styles/colors";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+enum AppState {
+  Loading,
+  Splash,
+  Main,
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  const [fontsLoaded] = FontPoppins.useFonts({
+    Poppins_400Regular: FontPoppins.Poppins_400Regular,
+    Poppins_500Medium: FontPoppins.Poppins_500Medium,
+    Poppins_600SemiBold: FontPoppins.Poppins_600SemiBold,
+    Poppins_700Bold: FontPoppins.Poppins_700Bold,
+    Rubik_400Regular: FontRubik.Rubik_500Medium,
+    Rubik_500Medium: FontRubik.Rubik_500Medium,
+    Rubik_600SemiBold: FontRubik.Rubik_600SemiBold,
+  });
+
+  const queryClient = new QueryClient();
+
+  const [appState, setAppState] = useState<AppState>(AppState.Loading);
+
+  const initApp = () => {
+    setBackgroundColorAsync(colors.background);
+    setButtonStyleAsync("dark");
+    setTimeout(() => setAppState(AppState.Main), 2650);
+  };
+
+  useEffect(() => initApp(), []);
+
+  const renderContent = () => {
+    const stateComponents: Record<AppState, JSX.Element> = {
+      [AppState.Loading]: <SplashScreen />,
+      [AppState.Splash]: <SplashScreen />,
+      [AppState.Main]: (
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <NavigationContainer>
+            <BottomSheetModalProvider>
+              <KeyboardProvider>
+                <QueryClientProvider client={queryClient}>
+                  <Routes />
+                </QueryClientProvider>
+              </KeyboardProvider>
+            </BottomSheetModalProvider>
+          </NavigationContainer>
+        </GestureHandlerRootView>
+      ),
+    };
+
+    return !fontsLoaded ? <SplashScreen /> : stateComponents[appState];
+  };
+
+  return (
+    <SafeAreaProvider>
+      <View className="flex-1 bg-primary">{renderContent()}</View>
+    </SafeAreaProvider>
+  );
+}
