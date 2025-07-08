@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "coro-jovem-amisadai-app",
+    "name": "Coro Jovem Amisadai",
     "slug": "coro-jovem-amisadai-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,22 +8,42 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#4C5E46"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#4C5E46"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.gabrielrick2941.corojovemamisadaiapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": false,
+          "faceIDPermission": "Allow Aluno Docs to access your Face ID biometric data."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ]
   }
 }
