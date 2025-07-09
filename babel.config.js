@@ -12,7 +12,7 @@ module.exports = function (api) {
           alias: {
             "@assets": "./src/assets",
             "@contexts": "./src/contexts",
-            "@screens": "./src/screens",
+            "@features": "./src/features",
             "@components": "./src/common/components",
             "@utils": "./src/common/utils",
             "@models": "./src/common/models",
@@ -20,7 +20,7 @@ module.exports = function (api) {
             "@hooks": "./src/common/hooks",
             "@services": "./src/common/services",
             "@styles": "./src/common/styles",
-            "@routes": "./src/routes",
+            "@navigation": "./src/navigation",
           },
           extensions: [".js", ".jsx", ".tsx", ".ts", ".json"],
         },

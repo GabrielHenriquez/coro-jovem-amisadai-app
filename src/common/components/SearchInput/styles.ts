@@ -1,6 +1,6 @@
 import { colors } from "@styles/colors";
 import { fontFamily } from "@styles/fonts";
-import { responsiveSize } from "@utils/responsiveSize";
+import { responsiveSize } from "@utils/index";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
     width: "100%",
   },
   contentInput: {
-    backgroundColor: colors.grayLighter,
+    backgroundColor: "#FFFFFF",
     width: "100%",
     height: responsiveSize(48),
     alignItems: "center",
@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.gray3,
-    elevation: 1
+    elevation: 1,
   },
   textInput: {
     flex: 1,

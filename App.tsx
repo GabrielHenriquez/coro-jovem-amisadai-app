@@ -6,8 +6,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Routes from "@routes/index";
-import SplashScreen from "@screens/intro/Splash/view";
+
+import SplashScreen from "features/splash/SplashScreen";
 import "./src/common/styles/global.css";
 import * as FontPoppins from "@expo-google-fonts/poppins";
 import * as FontRubik from "@expo-google-fonts/rubik";
@@ -16,6 +16,7 @@ import {
   setButtonStyleAsync,
 } from "expo-navigation-bar";
 import { colors } from "@styles/colors";
+import RootNavigator from "@navigation/index";
 
 enum AppState {
   Loading,
@@ -56,7 +57,7 @@ export default function App() {
             <BottomSheetModalProvider>
               <KeyboardProvider>
                 <QueryClientProvider client={queryClient}>
-                  <Routes />
+                  <RootNavigator />
                 </QueryClientProvider>
               </KeyboardProvider>
             </BottomSheetModalProvider>

@@ -4,7 +4,7 @@
     "baseUrl": "./src",
     "paths": {
       "@contexts/*": ["contexts/*"],
-      "@screens/*": ["screens/*"],
+      "@features/*": ["features/*"],
       "@assets/*": ["assets/*"],
       "@hooks/*": ["common/hooks/*"],
       "@services/*": ["common/services/*"],
@@ -13,7 +13,7 @@
       "@models/*": ["common/models/*"],
       "@components/*": ["common/components/*"],
       "@utils/*": ["common/utils/*"],
-      "@routes/*": ["routes/*"]
+      "@navigation/*": ["navigation/*"]
     },
     "strict": true
   }

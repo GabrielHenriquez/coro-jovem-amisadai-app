@@ -1,11 +1,10 @@
-import Text from "./Text";
+import { Text } from "@components/index";
 import { useState, useRef, Dispatch, SetStateAction, ReactNode } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { responsiveSize } from "@utils/responsiveSize";
 import { colors } from "@styles/colors";
+import { getHeight, responsiveSize } from "@utils/index";
 import * as RN from "react-native";
-import heightWindow from "@utils/getHeight";
-import height from "@utils/getHeight";
+
 export interface FlatListItem {
   key: "Secretário(a)" | "Dirigente" | "Vice-secretário";
   value: string;
@@ -74,7 +73,7 @@ export default function AnimatedDropdown({
       >
         <RN.View
           style={{
-            height: heightWindow * 0.0605,
+            height: getHeight * 0.0605,
             right: 1,
           }}
           className="w-16 bg-primary rounded-l-xl justify-center items-center"
@@ -141,7 +140,7 @@ const styles = RN.StyleSheet.create({
     borderColor: colors.gray3,
     elevation: 1,
     borderRadius: 12,
-    height: height * 0.06,
+    height: getHeight * 0.06,
   },
   selectedOption: {
     backgroundColor: colors.gray2,

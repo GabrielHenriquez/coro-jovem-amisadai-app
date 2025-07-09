@@ -1,6 +1,5 @@
 import * as RN from "react-native";
-import React from "react";
-import { responsiveSize } from "@utils/responsiveSize";
+import { responsiveSize } from "@utils/index";
 
 interface ResponsiveTextProps extends RN.TextProps {
   size?: number;

@@ -1,7 +1,6 @@
-import React from "react";
 import { Control, FieldError, useController } from "react-hook-form";
 import { colors } from "@styles/colors";
-import { responsiveSize } from "@utils/responsiveSize";
+import { responsiveSize } from "@utils/index";
 import * as RN from "react-native";
 
 interface InputProps extends RN.TextInputProps {

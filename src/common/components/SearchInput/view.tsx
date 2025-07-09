@@ -15,7 +15,7 @@ function SearchInput({
     <RN.View style={[styles.container, { ...styleRest }]}>
       <RN.View style={styles.contentInput}>
         <RN.View style={[styles.areaIcon, { marginRight: 0, marginLeft: 4 }]}>
-          <Search color={colors.greenMedium} />
+          <Search color={colors.primary} />
         </RN.View>
 
         <RN.TextInput
@@ -23,6 +23,7 @@ function SearchInput({
           placeholderTextColor={colors.gray}
           placeholder="Pesquisar"
           onChangeText={setSearchTerm}
+          className="py-0"
           style={styles.textInput}
           {...rest}
         />
