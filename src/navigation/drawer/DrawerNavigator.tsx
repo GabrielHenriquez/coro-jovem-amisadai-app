@@ -6,12 +6,15 @@ import { NavigatorScreenParams } from "@react-navigation/native";
 import MembersStack, {
   MembersStackParamList,
 } from "@features/members/navigation/MembersStack";
+import { CallStackParamList } from "@features/calls/navigation/CallsStack";
+import CallsStack from "@features/calls/navigation/CallsStack";
 
 const Drawer = createDrawerNavigator();
 const { width } = Dimensions.get("window");
 
 export type DrawerParamList = {
   MainTabs: NavigatorScreenParams<MainTabsParamList>;
+  CallsNavigation: NavigatorScreenParams<CallStackParamList>;
   MembersNavigation: NavigatorScreenParams<MembersStackParamList>;
 };
 
@@ -28,6 +31,7 @@ export default function DrawerNavigator() {
       drawerContent={CustomDrawerContent}
     >
       <Drawer.Screen name="MainTabs" component={MainTabs} />
+      <Drawer.Screen name="CallsNavigation" component={CallsStack} />
       <Drawer.Screen name="MembersNavigation" component={MembersStack} />
     </Drawer.Navigator>
   );

@@ -7,12 +7,12 @@ import Animated, {
 } from "react-native-reanimated";
 
 const AnimatedContainer = ({ children }: { children: React.ReactNode }) => {
-  const translateY = useSharedValue(300);
+  const translateY = useSharedValue(500);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
     translateY.value = withTiming(0, {
-      duration: 1250,
+      duration: 1450,
       easing: Easing.out(Easing.exp),
     });
     opacity.value = withTiming(1, { duration: 650 });

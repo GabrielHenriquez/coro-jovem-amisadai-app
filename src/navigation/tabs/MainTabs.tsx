@@ -6,11 +6,11 @@ import { colors } from "@styles/colors";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { DrawerParamList } from "@navigation/drawer/DrawerNavigator";
 import { AddButton, IconWithLabel } from "./components";
-import HomeScreen from "@features/home/screens/HomeScreen";
-import Members from "@features/members/screens/MembersScreen";
+import CallsScreen from "@features/calls/screens/CallsScreen";
+import MembersScreen from "@features/members/screens/MembersScreen";
 
 export type MainTabsParamList = {
-  Home: undefined;
+  Calls: undefined;
   Members: undefined;
 };
 
@@ -18,37 +18,36 @@ const Tab = createBottomTabNavigator<MainTabsParamList>();
 
 export const MainTabs = () => {
   const navigation = useNavigation<DrawerNavigationProp<DrawerParamList>>();
-  const [screenFocused, setScreenFocused] = useState("");
+  const [screenFocused, setScreenFocused] = useState<"Calls" | "Members">(
+    "Calls"
+  );
 
   const screenOptions = {
     tabBarHideOnKeyboard: true,
     tabBarShowLabel: false,
     headerShown: false,
     tabBarStyle: {
-      height: 55,
+      height: 56,
       backgroundColor: colors.background,
       borderTopWidth: 1,
-      borderColor: "#d3d3d3",
+      borderColor: "#cfcfcf",
     },
   };
 
   return (
     <>
       <Tab.Navigator
-        initialRouteName="Home"
+        initialRouteName="Calls"
         screenOptions={screenOptions}
         screenListeners={({ route }) => ({
-          focus: () => {
-            console.log(route);
-            setScreenFocused(route?.name);
-          },
+          focus: () => setScreenFocused(route?.name),
         })}
       >
         <Tab.Screen
-          name="Home"
-          component={HomeScreen}
+          name="Calls"
+          component={CallsScreen}
           options={{
-            tabBarItemStyle: { left: 15 },
+            tabBarItemStyle: { left: 12.5 },
             tabBarIcon: ({ focused }) => (
               <IconWithLabel
                 name="calendar"
@@ -61,9 +60,9 @@ export const MainTabs = () => {
 
         <Tab.Screen
           name="Members"
-          component={Members}
+          component={MembersScreen}
           options={{
-            tabBarItemStyle: { right: 15 },
+            tabBarItemStyle: { right: 12.5 },
             tabBarIcon: ({ focused }) => (
               <IconWithLabel
                 name="users"
@@ -83,8 +82,12 @@ export const MainTabs = () => {
         }}
       >
         <AddButton
+          screenFocused={screenFocused}
           onPress={() => {
-            if (screenFocused === "HomeNavigation") return;
+            if (screenFocused === "Calls")
+              navigation.navigate("CallsNavigation", {
+                screen: "CreateCall",
+              });
 
             if (screenFocused === "Members")
               navigation.navigate("MembersNavigation", {

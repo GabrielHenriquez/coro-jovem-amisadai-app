@@ -2,8 +2,7 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
 } from "@react-navigation/native-stack";
-
-import SPA from "features/auth/screens/AuthScreenSPA";
+import AuthSPAScreen from "../screens/AuthSPAScreen";
 
 export type AuthStackParamList = {
   AuthSPA: undefined;
@@ -20,7 +19,7 @@ const AuthStack = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="AuthSPA" component={SPA} />
+      <Stack.Screen name="AuthSPA" component={AuthSPAScreen} />
     </Stack.Navigator>
   );
 };

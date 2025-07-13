@@ -1,3 +1,3 @@
 // contents/index.ts
-export { default as AnimatedContainer } from "./animatedContainer";
-export { default as AnimatedLogo } from "./animatedLogo";
+export { default as AnimatedContainer } from "./AnimatedContainer";
+export { default as AnimatedLogo } from "./AnimatedLogo";

@@ -1,62 +1,98 @@
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { Modal, Button, Text } from "@components/index";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
-import { View, Image, StatusBar } from "react-native";
 import { colors } from "@styles/colors";
-import { ArrowBigUpDashIcon, FolderClosed, LogOut } from "lucide-react-native";
-import { useNavigation } from "@react-navigation/native";
-import { LogOutLogo } from "@assets/images/modal";
-
-interface ButtonContent {
-  icon: ReactNode;
-  text: string;
-  action: VoidFunction;
-}
+import { LogOut } from "lucide-react-native";
+import * as RN from "react-native";
 
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { AppNavigationProp } from "@features/home/navigation/HomeStack";
+import { CallNavigationProp } from "@features/calls/navigation/CallsStack";
 
 export default function CustomDrawerContent(
   props: DrawerContentComponentProps
 ) {
   const [showModal, setShowModal] = useState(false);
   /*   const { user, logout } = useAuthStore(); */
-  const { navigate } = useNavigation<AppNavigationProp>();
 
   return (
     <DrawerContentScrollView
       {...props}
       contentContainerStyle={{
         flex: 1,
-        paddingTop: StatusBar.currentHeight! + 30,
+        paddingTop: RN.StatusBar.currentHeight! + 30,
       }}
       className="bg-white"
     >
-      <View className="px-4 mt-8">
+      <RN.View className="px-4 mt-8">
+        <RN.View className="items-center gap-4">
+          <RN.View
+            style={{
+              height: 84,
+              width: 84,
+              borderRadius: 42,
+              backgroundColor: colors.primary,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text size={30} className="font-poppinsSemiBold text-white">
+              GH
+            </Text>
+          </RN.View>
+
+          <RN.View className="gap-1 items-center">
+            <Text size={18} className="font-poppinsSemiBold">
+              Gabriel Henrique Soares
+            </Text>
+
+            <Text className="font-poppinsMedium text-gray">
+              Vice-Secretário(a)
+            </Text>
+          </RN.View>
+        </RN.View>
+
         <Button
           bgColor="redDark"
-          styleRest={{ height: 38 }}
+          styleRest={{ height: 38, marginTop: 20 }}
           onPress={() => setShowModal(true)}
         >
-          <Text size={16} className="text-white font-bold">
+          <Text size={16} className="text-white font-poppinsSemiBold">
             Sair
           </Text>
+
+          <LogOut size={20} color={colors.white} />
         </Button>
-      </View>
+      </RN.View>
 
       <Modal.Root>
         <Modal.Content visible={showModal}>
           <Modal.AreaCloseModal onClose={() => setShowModal(false)} />
           <Modal.Logo>
-            <LogOutLogo width={90} height={90} />
+            <RN.View
+              style={{
+                height: 90,
+                width: 90,
+                backgroundColor: "#eeb7b7",
+                borderRadius: 45,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <LogOut
+                style={{ left: 4 }}
+                strokeWidth={2}
+                size={40}
+                color={colors.redDark}
+              />
+            </RN.View>
           </Modal.Logo>
           <Modal.Title>Tem certeza que deseja sair?</Modal.Title>
           <Button
             styleRest={{ height: 40, marginTop: 4 }}
             bgColor="redDark"
             onPress={() => {
-              setShowModal(false);
-              /*  logout(); */
+              /* 
+               logout(); */
             }}
           >
             <Text className="text-white font-poppinsSemiBold">Sair</Text>

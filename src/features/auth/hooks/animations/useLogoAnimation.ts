@@ -13,9 +13,9 @@ const useLogoAnimation = () => {
   const { height } = useWindowDimensions();
   const screenHeight = useMemo(() => height, [height]);
 
-  const translateY = useSharedValue(-300);
+  const translateY = useSharedValue(-450);
   const opacity = useSharedValue(0);
-  const size = useSharedValue(330);
+  const size = useSharedValue(320);
   const Aheight = useSharedValue(0.4);
   const showRegisterView = useSharedValue(false);
 
@@ -37,8 +37,8 @@ const useLogoAnimation = () => {
 
   const animatedCollpaseHeightLogo = () => {
     if (Aheight.value !== 0.12) {
-      Aheight.value = withTiming(0.12, timingConfig);
-      size.value = withTiming(120, { duration: 750 });
+      Aheight.value = withTiming(0.14, timingConfig);
+      size.value = withTiming(150, { duration: 750 });
       showRegisterView.value = true;
     }
   };
@@ -46,14 +46,14 @@ const useLogoAnimation = () => {
   const animatedExpandableHeightLogo = () => {
     if (Aheight.value !== 0.4) {
       Aheight.value = withTiming(0.4, timingConfig);
-      size.value = withTiming(330, { duration: 750 });
+      size.value = withTiming(320, { duration: 750 });
       showRegisterView.value = false;
     }
   };
 
   const applyAnimationDownLogo = () => {
     translateY.value = withTiming(0, {
-      duration: 1200,
+      duration: 1450,
       easing: Easing.out(Easing.exp),
     });
     opacity.value = withTiming(1, { duration: 1200 });

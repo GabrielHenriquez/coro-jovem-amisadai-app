@@ -5,8 +5,9 @@ import { useLogoAnimation } from "../hooks";
 import { AnimatedContainer, AnimatedLogo } from "../components";
 import { LoginContent, RegisterContent } from "@features/auth/contents";
 import * as RN from "react-native";
+import AnimatedContent from "../components/AnimatedContent";
 
-const SPA = () => {
+const AuthSPAScreen = () => {
   const {
     showRegisterView,
     heightAnimatedStyle,
@@ -17,16 +18,14 @@ const SPA = () => {
     animatedExpandableHeightLogo,
   } = useLogoAnimation();
 
-  const isIos = RN.Platform.OS === "ios";
-
   return (
     <RN.View className="flex-1 bg-primary">
       <StatusBar backgroundColor="primary" barStyle={"light-content"} />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={isIos ? "padding" : "height"}
-        keyboardVerticalOffset={isIos ? 100 : 0}
+        behavior={"height"}
+        keyboardVerticalOffset={0}
       >
         <RN.TouchableWithoutFeedback onPress={RN.Keyboard.dismiss}>
           <RN.ScrollView
@@ -46,13 +45,17 @@ const SPA = () => {
             </Animated.View>
 
             <AnimatedContainer>
-              {!showRegisterView ? (
-                <LoginContent collapseLogoFn={animatedCollpaseHeightLogo} />
-              ) : (
-                <RegisterContent
-                  collapseLogoFn={animatedExpandableHeightLogo}
-                />
-              )}
+              <RN.View style={{ position: "relative", height: "100%" }}>
+                <AnimatedContent visible={!showRegisterView}>
+                  <LoginContent collapseLogoFn={animatedCollpaseHeightLogo} />
+                </AnimatedContent>
+
+                <AnimatedContent visible={showRegisterView}>
+                  <RegisterContent
+                    collapseLogoFn={animatedExpandableHeightLogo}
+                  />
+                </AnimatedContent>
+              </RN.View>
             </AnimatedContainer>
           </RN.ScrollView>
         </RN.TouchableWithoutFeedback>
@@ -61,4 +64,4 @@ const SPA = () => {
   );
 };
 
-export default SPA;
+export default AuthSPAScreen;

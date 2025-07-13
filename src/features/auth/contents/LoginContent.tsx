@@ -12,16 +12,16 @@ const LoginContent = ({ collapseLogoFn }: { collapseLogoFn: VoidFunction }) => {
   return (
     <RN.View
       style={{ borderTopLeftRadius: 45, borderTopRightRadius: 45 }}
-      className="flex-1 bg-background py-4"
+      className="flex-1 bg-background py-5"
     >
-      <Text className="text-center font-poppinsBold text-primary" size={28}>
+      <Text className="text-center font-poppinsBold text-primary" size={26}>
         Acesse sua conta
       </Text>
 
-      <RN.View className="px-5 mt-4">
+      <RN.View className="px-5 mt-5">
         <Input.Root>
           <Input.Content
-            icon={<AtSign size={22} color={"#FFFFFF"} />}
+            icon={<AtSign size={20} color={"#FFFFFF"} strokeWidth={2.5} />}
             errors={FORM.errors.email!}
           >
             <Input.TextInput
@@ -37,7 +37,7 @@ const LoginContent = ({ collapseLogoFn }: { collapseLogoFn: VoidFunction }) => {
 
         <Input.Root>
           <Input.Content
-            icon={<LockKeyhole size={22} color={"#FFFFFF"} />}
+            icon={<LockKeyhole size={20} color={"#FFFFFF"} strokeWidth={2.5} />}
             errors={FORM.errors.password!}
           >
             <Input.TextInput

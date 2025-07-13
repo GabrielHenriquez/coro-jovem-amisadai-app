@@ -18,15 +18,17 @@ const IconWithLabel = ({
     <View style={{ width: 100, justifyContent: "center", ...positionStyle }}>
       <FontAwesome
         name={name}
-        size={22}
-        color={focused ? colors.primary : colors.gray}
+        size={23}
+        color={focused ? colors.primary : "#8f9c8a"}
       />
       <Text
         style={{
-          fontSize: 10,
-          color: focused ? colors.primary : colors.gray,
+          fontSize: 11,
+          color: focused ? colors.primary : "#8f9c8a",
           marginTop: 6,
-          fontFamily: fontFamily.poppinsSemiBold,
+          fontFamily: focused
+            ? fontFamily.poppinsBold
+            : fontFamily.poppinsSemiBold,
         }}
       >
         {label}

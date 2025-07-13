@@ -2,38 +2,42 @@ import * as RN from "react-native";
 import React from "react";
 import Text from "@components/Text";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { Clock } from "lucide-react-native";
 
-const EventCard = () => {
+const EventCard = ({ onPress }: { onPress: VoidFunction }) => {
   return (
     <RN.TouchableOpacity
       style={{
         borderWidth: 1,
         borderColor: "#CCC",
-        elevation: 2,
+        elevation: 3,
+        gap: 18,
       }}
-      className="flex-row items-center gap-4 mt-3 py-2 px-3 bg-white rounded-xl"
+      onPress={onPress}
+      className="flex-row items-center mt-3 py-3 px-4 bg-white rounded-xl"
     >
       <RN.View
         style={{
           borderRadius: 30,
+          width: 16.5,
         }}
-        className="h-12 w-5 bg-red-600"
+        className="h-12  bg-red-600"
       />
-      <RN.View className="gap-0.5">
-        <Text className="font-poppinsMedium">
+      <RN.View className="gap-2">
+        <Text className="font-poppinsSemiBold">
           Chamada - Coro Jovem Amisadai
         </Text>
 
         <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
-          <Feather size={16} name="book-open" />
-          <Text size={14} className="font-poppins text-grayDark">
+          <Feather size={14} name="book-open" />
+          <Text size={14} className="font-poppinsMedium text-grayDark">
             Culto: Pregação
           </Text>
         </RN.View>
 
-        <RN.View style={{ gap: 7, flexDirection: "row", alignItems: "center" }}>
-          <Ionicons size={17} name="stopwatch-outline" />
-          <Text size={14} className="font-poppins  text-grayDark">
+        <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
+          <Clock size={14} />
+          <Text size={14} className="font-poppinsMedium  text-grayDark">
             Horário: 19h30
           </Text>
         </RN.View>

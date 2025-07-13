@@ -1,12 +1,13 @@
+import { colors } from "@styles/colors";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EBF0E5",
+    backgroundColor: colors.background,
   },
   header: {
-    backgroundColor: "#4C5E46",
+    backgroundColor: colors.primary,
     borderBottomLeftRadius: 55,
     borderBottomRightRadius: 55,
     paddingBottom: 10,
@@ -35,7 +36,6 @@ const styles = StyleSheet.create({
   },
   calendar: {
     backgroundColor: "transparent",
-    marginTop: 10,
   },
   toggleButton: {
     height: 30,
@@ -59,12 +59,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "Rubik_500Medium",
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: 20,
   },
   headerStyle: {
     borderBottomWidth: 0.5,
     borderBottomColor: "#E8E8E8",
-    top: -14,
+    top: -16,
   },
   selected: {
     color: "#4C5E46",

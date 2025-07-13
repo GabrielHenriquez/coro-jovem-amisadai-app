@@ -1,7 +1,6 @@
 import { Input, Spacer, Text, Button, Dropdown } from "@components/index";
 import { colors } from "@styles/colors";
 import { useFormRegister, useRegister } from "../hooks";
-import { useState } from "react";
 import {
   AtSign,
   BriefcaseBusinessIcon,
@@ -11,25 +10,26 @@ import {
 } from "lucide-react-native";
 import * as RN from "react-native";
 
+export type OfficeValue = "Dirigente" | "Secretário(a)" | "Vice-secretário(a)";
+
 const RegisterContent = ({ collapseLogoFn }: any) => {
   const FORM = useFormRegister();
   const VM = useRegister();
-  const [selected, setSelected] = useState(null);
 
   return (
     <RN.View
       style={{ borderTopLeftRadius: 45, borderTopRightRadius: 45 }}
       className="flex-1 bg-background py-5"
     >
-      <Text className="text-center font-poppinsBold text-primary" size={28}>
+      <Text className="text-center font-poppinsBold text-primary" size={26}>
         Criar conta
       </Text>
 
-      <RN.View className="px-5 pb-4 mt-4">
+      <RN.View className="px-5 pb-4 mt-5">
         <RN.View className="gap-4">
           <Input.Root>
             <Input.Content
-              icon={<User size={24} color={"#FFFFFF"} />}
+              icon={<User size={22} color={"#FFFFFF"} strokeWidth={2.5} />}
               errors={FORM.errors.name!}
             >
               <Input.TextInput
@@ -43,7 +43,7 @@ const RegisterContent = ({ collapseLogoFn }: any) => {
 
           <Input.Root>
             <Input.Content
-              icon={<Phone size={22} color={"#FFFFFF"} />}
+              icon={<Phone size={20} color={"#FFFFFF"} strokeWidth={2.5} />}
               errors={FORM.errors.phone!}
             >
               <Input.TextInputMask
@@ -59,7 +59,7 @@ const RegisterContent = ({ collapseLogoFn }: any) => {
 
           <Input.Root>
             <Input.Content
-              icon={<AtSign size={22} color={"#FFFFFF"} />}
+              icon={<AtSign size={20} color={"#FFFFFF"} strokeWidth={2.5} />}
               errors={FORM.errors.email!}
             >
               <Input.TextInput
@@ -72,19 +72,25 @@ const RegisterContent = ({ collapseLogoFn }: any) => {
           </Input.Root>
 
           <Dropdown
-            data={[
-              { key: "Dirigente", value: "Dirigente" },
-              { key: "Secretário(a)", value: "Secretário(a)" },
-              { key: "Vice-Secretário(a)", value: "Vice-Secretário(a)" },
-            ]}
-            selected={selected}
-            setSelected={setSelected}
-            icon={<BriefcaseBusinessIcon color={"#FFF"} size={22} />}
+            data={["Dirigente", "Secretário(a)", "Vice-secretário(a)"]}
+            placeholder="Selecione seu cargo"
+            control={FORM.control}
+            name="office"
+            icon={
+              <BriefcaseBusinessIcon
+                size={20}
+                color={"#FFFFFF"}
+                strokeWidth={2.5}
+              />
+            }
+            error={FORM.errors.office!}
           />
 
           <Input.Root>
             <Input.Content
-              icon={<LockKeyhole size={22} color={"#FFFFFF"} />}
+              icon={
+                <LockKeyhole size={20} color={"#FFFFFF"} strokeWidth={2.5} />
+              }
               errors={FORM.errors.password!}
             >
               <Input.TextInput
@@ -104,7 +110,9 @@ const RegisterContent = ({ collapseLogoFn }: any) => {
 
           <Input.Root>
             <Input.Content
-              icon={<LockKeyhole size={22} color={"#FFFFFF"} />}
+              icon={
+                <LockKeyhole size={20} color={"#FFFFFF"} strokeWidth={2.5} />
+              }
               errors={FORM.errors.passwordConfirm!}
             >
               <Input.TextInput
