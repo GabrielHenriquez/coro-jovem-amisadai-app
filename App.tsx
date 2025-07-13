@@ -1,3 +1,4 @@
+import "./src/global/styles/global.css";
 import { JSX, useEffect, useState } from "react";
 import { View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -6,9 +7,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-import SplashScreen from "features/splash/SplashScreen";
-import "./src/common/styles/global.css";
 import * as FontPoppins from "@expo-google-fonts/poppins";
 import * as FontRubik from "@expo-google-fonts/rubik";
 import {
@@ -17,6 +15,7 @@ import {
 } from "expo-navigation-bar";
 import { colors } from "@styles/colors";
 import RootNavigator from "@navigation/index";
+import SplashScreen from "features/splash/SplashScreen";
 
 enum AppState {
   Loading,
@@ -33,6 +32,7 @@ export default function App() {
     Rubik_400Regular: FontRubik.Rubik_500Medium,
     Rubik_500Medium: FontRubik.Rubik_500Medium,
     Rubik_600SemiBold: FontRubik.Rubik_600SemiBold,
+    Rubik_700Bold: FontRubik.Rubik_700Bold,
   });
 
   const queryClient = new QueryClient();
