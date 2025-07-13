@@ -1,11 +1,10 @@
-import { Control, FieldError, useController } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 import { colors } from "@styles/colors";
 import { responsiveSize } from "@utils/index";
 import * as RN from "react-native";
 
 interface InputProps extends RN.TextInputProps {
   control?: Control<any>;
-  errors?: FieldError;
   isActivePassword?: boolean;
   name: string;
   isRegistrationField?: boolean;
@@ -14,7 +13,6 @@ interface InputProps extends RN.TextInputProps {
 const TextInput = ({
   control,
   name,
-  errors,
   isActivePassword,
   isRegistrationField,
   ...rest
@@ -33,16 +31,17 @@ const TextInput = ({
     return (
       <RN.TextInput
         {...rest}
+        allowFontScaling={false}
         value={field.value}
         onChangeText={handleTextChange}
         secureTextEntry={isActivePassword}
         placeholderTextColor={colors.gray}
         textAlignVertical="center"
         style={{
-          fontSize: responsiveSize(16),
-          paddingHorizontal: 12,
+          fontSize: responsiveSize(14),
+          paddingHorizontal: 10,
         }}
-        className="flex-1 h-12 font-poppinsMedium text-black py-0 pt-1.5"
+        className="flex-1 h-12 font-poppinsSemiBold text-black py-0 pt-1.5"
       />
     );
   }

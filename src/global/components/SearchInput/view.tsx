@@ -8,7 +8,6 @@ function SearchInput({
   searchTerm,
   styleRest,
   setSearchTerm,
-
   ...rest
 }: InputProps) {
   return (

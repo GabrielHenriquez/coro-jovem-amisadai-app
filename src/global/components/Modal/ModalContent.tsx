@@ -16,13 +16,13 @@ const ModalContent = ({ children, ...rest }: IProps) => {
       {...rest}
     >
       <RN.View
-        className="justify-center items-center px-12"
+        className="justify-center items-center px-14"
         style={{
           height: height + RN.StatusBar?.currentHeight!,
-          backgroundColor: "rgba(0,0,0, 0.6)",
+          backgroundColor: "rgba(0,0,0, 0.4)",
         }}
       >
-        <RN.View className="w-full min-h-14 rounded-2xl bg-white items-center justify-center py-5 px-4 gap-2.5">
+        <RN.View className="w-full min-h-14 rounded-2xl bg-white items-center justify-center py-5 px-4 gap-3.5">
           {children}
         </RN.View>
       </RN.View>

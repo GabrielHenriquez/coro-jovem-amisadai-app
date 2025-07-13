@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   contentInput: {
     backgroundColor: "#FFFFFF",
     width: "100%",
-    height: responsiveSize(48),
+    height: responsiveSize(46),
     alignItems: "center",
     flexDirection: "row",
     borderRadius: 8,
@@ -20,7 +20,8 @@ export const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    height: responsiveSize(48),
+    height: responsiveSize(45),
+    top: 1,
     fontSize: responsiveSize(16),
     fontFamily: fontFamily.poppinsSemiBold,
     color: colors.black,

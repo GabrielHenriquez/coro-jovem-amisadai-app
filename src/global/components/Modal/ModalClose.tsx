@@ -6,7 +6,7 @@ type Props = {
 };
 
 const AreaModalClose = ({ onClose }: Props) => (
-  <RN.View className="w-full items-end">
+  <RN.View className="w-full items-end absolute top-0 py-2">
     <RN.TouchableOpacity className="w-8 items-center" onPress={onClose}>
       <X color="black" size={30} />
     </RN.TouchableOpacity>

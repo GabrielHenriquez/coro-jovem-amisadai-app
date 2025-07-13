@@ -2,13 +2,13 @@ import React from "react";
 import * as RN from "react-native";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { colors, IColors } from "@styles/colors";
+import { getHeight } from "@utils/index";
 
 interface ButtonProps extends RN.TouchableOpacityProps {
   bgColor?: IColors;
   activeLoading?: boolean;
   styleRest?: RN.ViewStyle;
 }
-const { height } = RN.Dimensions.get("window");
 
 const Button = ({
   activeLoading,
@@ -19,9 +19,13 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <TouchableOpacity
-      className="w-full h-12 rounded-lg justify-center"
+      className="w-full  rounded-lg justify-center"
       style={[
-        { backgroundColor: colors[bgColor], height: height * 0.06, alignItems: "center" },
+        {
+          backgroundColor: colors[bgColor],
+          height: getHeight * 0.052,
+          alignItems: "center",
+        },
         styleRest,
       ]}
       {...rest}

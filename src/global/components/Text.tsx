@@ -17,7 +17,8 @@ const Text = ({
   return (
     <RN.Text
       className={className}
-      style={[{ fontSize: responsiveSize(size) }, style]}
+      allowFontScaling={false}
+      style={[{ fontSize: responsiveSize(size), lineHeight: size + 5 }, style]}
       {...rest}
     >
       {children}

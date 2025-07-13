@@ -7,3 +7,5 @@ export { default as StatusBar } from "./StatusBar";
 export { default as Header } from "./Header";
 export { default as Text } from "./Text";
 export { default as Dropdown } from "./Dropdown";
+export { default as HeaderWithMenu } from "./HeaderWithMenu";
+export { default as BaseBottomSheet } from "./BaseBottomSheet";

@@ -1,14 +1,14 @@
 import { ReactNode } from "react";
-import { FieldError } from "react-hook-form";
+import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 import { colors } from "@styles/colors";
-import Text from "@components/Text";
 import * as RN from "react-native";
+import Text from "@components/Text";
 import height from "@utils/getHeight";
 
 interface InputContentProps extends RN.ViewProps {
   children: ReactNode;
-  errors: FieldError;
-  icon: ReactNode;
+  errors: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
+  icon?: ReactNode;
 }
 
 const InputContent = ({
@@ -22,7 +22,7 @@ const InputContent = ({
       <RN.View
         className="w-full bg-white flex-row items-center rounded-xl"
         style={{
-          height: height * 0.06,
+          height: height * 0.052,
           borderWidth: 1,
           borderColor: !!errors ? colors.redDark : colors.grayLight,
           elevation: 1,
@@ -31,7 +31,7 @@ const InputContent = ({
         {icon && (
           <RN.View
             style={{
-              height: height * 0.0605,
+              height: height * 0.0521,
               right: 1,
             }}
             className="w-16 bg-primary rounded-l-xl justify-center items-center"
