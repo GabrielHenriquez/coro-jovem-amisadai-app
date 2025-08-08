@@ -3,16 +3,15 @@ import { Modal, Button, Text } from "@components/index";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { colors } from "@styles/colors";
 import { LogOut } from "lucide-react-native";
-import * as RN from "react-native";
-
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { CallNavigationProp } from "@features/calls/navigation/CallsStack";
+import { useAuthStore } from "@features/auth/presentation/stores/authStore";
+import * as RN from "react-native";
 
 export default function CustomDrawerContent(
   props: DrawerContentComponentProps
 ) {
   const [showModal, setShowModal] = useState(false);
-  /*   const { user, logout } = useAuthStore(); */
+  const { user, logout } = useAuthStore();
 
   return (
     <DrawerContentScrollView
@@ -42,12 +41,10 @@ export default function CustomDrawerContent(
 
           <RN.View className="gap-1 items-center">
             <Text size={18} className="font-poppinsSemiBold">
-              Gabriel Henrique Soares
+              {user?.name}
             </Text>
 
-            <Text className="font-poppinsMedium text-gray">
-              Vice-Secretário(a)
-            </Text>
+            <Text className="font-poppinsMedium text-gray">{user?.office}</Text>
           </RN.View>
         </RN.View>
 
@@ -66,7 +63,11 @@ export default function CustomDrawerContent(
 
       <Modal.Root>
         <Modal.Content visible={showModal}>
-          <Modal.AreaCloseModal onClose={() => setShowModal(false)} />
+          <Modal.AreaCloseModal
+            onClose={() => {
+              setShowModal(false);
+            }}
+          />
           <Modal.Logo>
             <RN.View
               style={{
@@ -91,8 +92,8 @@ export default function CustomDrawerContent(
             styleRest={{ height: 40, marginTop: 4 }}
             bgColor="redDark"
             onPress={() => {
-              /* 
-               logout(); */
+              setShowModal(false);
+              setTimeout(() => logout(), 100);
             }}
           >
             <Text className="text-white font-poppinsSemiBold">Sair</Text>
