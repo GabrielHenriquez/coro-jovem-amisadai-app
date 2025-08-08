@@ -39,7 +39,7 @@ const TextInputMask = ({
           flex: 1,
           fontFamily: "Poppins_600SemiBold",
           height: 50,
-          paddingHorizontal: 12,
+          paddingHorizontal: 10,
           paddingVertical: 0,
           paddingTop: 6,
         }}
