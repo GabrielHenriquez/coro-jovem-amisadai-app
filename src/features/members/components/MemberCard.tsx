@@ -2,8 +2,16 @@ import * as RN from "react-native";
 import Text from "@components/Text";
 import { Mic2 } from "lucide-react-native";
 import { colors } from "@styles/colors";
+import { IMember } from "../domain/entities/Member";
+import { calcularIdade } from "../utils/calculateAge";
 
-const MemberCard = ({ onPress }: { onPress: VoidFunction }) => {
+const MemberCard = ({
+  onPress,
+  member,
+}: {
+  onPress: VoidFunction;
+  member: IMember;
+}) => {
   return (
     <RN.TouchableOpacity
       style={{
@@ -13,21 +21,25 @@ const MemberCard = ({ onPress }: { onPress: VoidFunction }) => {
         elevation: 3,
         gap: 20,
       }}
-      onPress={onPress}
+      onPress={() => onPress(member?.id)}
       className="px-5 bg-white rounded-2xl flex-row items-center"
     >
       <RN.View
         style={{
           borderRadius: 30,
           width: 14,
+          backgroundColor:
+            member?.gender === "Masculino" ? colors.blue : "#bd236b",
         }}
-        className="h-11 bg-blue"
+        className="h-11"
       />
 
       <RN.View className="gap-3.5 flex-row items-center">
         <RN.Image
           source={{
-            uri: "https://firebasestorage.googleapis.com/v0/b/coro-jovem-amisadai.appspot.com/o/component-Gabriel%20Henrique%20Soares-002684712%2FprofileImage?alt=media&token=188f4a75-42e6-4a55-9322-56e10cbc36dc",
+            uri: member?.profileImageUri
+              ? member.profileImageUri
+              : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
           }}
           style={{
             width: 52,
@@ -36,11 +48,12 @@ const MemberCard = ({ onPress }: { onPress: VoidFunction }) => {
             borderWidth: 1,
             borderColor: colors.gray,
           }}
+          resizeMode="cover"
         />
 
         <RN.View className="gap-1">
           <Text size={17} className="font-poppinsSemiBold leading-none">
-            Gabriel Henrique
+            {member?.name}
           </Text>
 
           <RN.View className="flex-row gap-1.5 items-center right-0.5">
@@ -49,7 +62,7 @@ const MemberCard = ({ onPress }: { onPress: VoidFunction }) => {
               size={14}
               className="font-poppinsMedium text-gray leading-none"
             >
-              Baixo • 25 anos
+              {member?.suit} • {calcularIdade(member?.birthDate)} anos
             </Text>
           </RN.View>
         </RN.View>
