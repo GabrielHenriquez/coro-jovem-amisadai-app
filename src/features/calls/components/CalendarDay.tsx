@@ -7,9 +7,11 @@ const CalendarDay = memo(
   ({
     date,
     state,
+    test,
     day,
     setDay,
   }: {
+    test: any;
     date: DateData;
     state: DayState;
     day: DateData;
@@ -20,7 +22,10 @@ const CalendarDay = memo(
     const isSelected = date.dateString === day?.dateString;
 
     const handlePress = () => {
-      if (!isSelected) setDay(date);
+      if (!isSelected) {
+        test(date.dateString);
+        setDay(date);
+      }
     };
 
     return (
