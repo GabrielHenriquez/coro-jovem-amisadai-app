@@ -7,18 +7,52 @@ import getHeight from "@utils/getHeight";
 import { IMember } from "../domain/entities/Member";
 import { calcularIdade } from "../utils/calculateAge";
 import { useNavigation } from "@react-navigation/native";
-import { MembersNavigationProp } from "../navigation/MembersStack";
 import { useBottomSheet } from "@gorhom/bottom-sheet";
+
+const MemberDetailItem = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) => (
+  <RN.View className={`flex-row gap-2 justify-center`}>
+    <Component.Text className="font-poppinsSemiBold text-black">
+      {label}:
+    </Component.Text>
+
+    <Component.Text
+      className="font-poppins text-grayDark"
+      style={{
+        flexWrap: "wrap",
+        maxWidth: "70%",
+      }}
+    >
+      {value}
+    </Component.Text>
+  </RN.View>
+);
 
 const MemberPreview = ({
   memberPressed,
   handleDeleteMember,
 }: {
   memberPressed: IMember;
-  handleDeleteMember: () => void;
+  handleDeleteMember: (member: IMember) => void;
 }) => {
-  const { navigate } = useNavigation<MembersNavigationProp>();
+  const { navigate } = useNavigation<any>();
   const { close } = useBottomSheet();
+
+  const memberDetails = [
+    { label: "Data de nascimento", value: memberPressed?.birthDate },
+    { label: "Nº Cartão de membro", value: memberPressed?.memberCard },
+    { label: "Batizado no espírito santo", value: memberPressed?.baptized },
+    {
+      label: "Endereço",
+      value: `${memberPressed?.street}, ${memberPressed?.number}`,
+    },
+  ];
+
   return (
     <RN.View className="items-center px-10">
       <RN.Image
@@ -51,39 +85,15 @@ const MemberPreview = ({
         </RN.View>
       </RN.View>
 
-      <RN.View className="gap-2.5 mt-5 items-center">
-        <RN.View className="flex-row gap-1.5">
-          <Component.Text className="font-poppinsSemiBold text-black">
-            Data de nascimento:
-          </Component.Text>
-          <Component.Text className="font-poppins text-grayDark">
-            {memberPressed?.birthDate}
-          </Component.Text>
-        </RN.View>
-        <RN.View className="flex-row gap-1.5">
-          <Component.Text className="font-poppinsSemiBold  text-black">
-            Nº Cartão de membro:
-          </Component.Text>
-          <Component.Text className="font-poppins text-grayDark">
-            {memberPressed?.memberCard}
-          </Component.Text>
-        </RN.View>
-        <RN.View className="flex-row gap-1.5">
-          <Component.Text className="font-poppinsSemiBold  text-black">
-            Batizado no espírito santo:
-          </Component.Text>
-          <Component.Text className="font-poppins text-grayDark">
-            {memberPressed?.baptized}
-          </Component.Text>
-        </RN.View>
-        <RN.View className="flex-row gap-1.5 items-center">
-          <Component.Text className="font-poppinsSemiBold  text-black">
-            Endereço:
-          </Component.Text>
-          <Component.Text className="font-poppins text-grayDark">
-            {memberPressed?.street}, {memberPressed?.number}
-          </Component.Text>
-        </RN.View>
+      <RN.View className="gap-2.5 mt-5 w-full">
+        {memberDetails.map((detail, index) => (
+          <MemberDetailItem
+            key={index}
+            label={detail.label}
+            value={detail.value!}
+            className={detail.className}
+          />
+        ))}
       </RN.View>
 
       <Component.Spacer height={25} />
