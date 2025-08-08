@@ -20,7 +20,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const storedUser = await secureStorage.getAuth();
     if (storedUser) {
       const user = await authRepo.getUser(storedUser);
-      console.log("🔐 Usuário carregado do armazenamento seguro:", user);
+      console.log("🔐 Usuário carregado do armazenamento seguro:", user?.name);
       set({ user });
     }
   },
