@@ -1,10 +1,14 @@
 import { CreateCallProvider } from "../contexts/CreateCallContext";
 import CreateCallScreenContent from "../contents/CreateCallScreenContent";
+import { useRoute } from "@react-navigation/native";
 
 const CreateCallSPAScreen = () => {
+  const route = useRoute();
+  const event = route?.params?.event;
+
   return (
     <CreateCallProvider>
-      <CreateCallScreenContent />
+      <CreateCallScreenContent eventData={event} />
     </CreateCallProvider>
   );
 };

@@ -1,5 +1,5 @@
 import useAnimationContent from "../hooks/animations/useAnimationContent";
-import useCreateCallContext from "../contexts/CreateCallContext";
+
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { colors } from "@styles/colors";
 import height from "@utils/getHeight";
@@ -14,17 +14,21 @@ import {
   StepIndicators,
 } from "../components";
 import * as RN from "react-native";
+import Toast from "@components/Toast/view";
+import { useCreateCallContext } from "../contexts/CreateCallContext";
+import { IEvent } from "../domain/entities/Events";
 
-const CreateCallScreenContent = () => {
+const CreateCallScreenContent = ({ eventData }: { eventData: IEvent }) => {
   const { goBack } = useNavigation();
-  const { resetAll, step, membersData } = useCreateCallContext();
+  const { resetAll, step, visibleToast, setVisibleToast } =
+    useCreateCallContext();
   const { animatedContentStyles } = useAnimationContent();
   useFocusEffect(useCallback(() => resetAll(), []));
 
   const renderStepContent = () => {
     switch (step) {
       case 0:
-        return <CreateCallFormContent />;
+        return <CreateCallFormContent eventData={eventData} />;
       case 1:
         return <MembersList />;
       case 2:
@@ -37,7 +41,7 @@ const CreateCallScreenContent = () => {
   return (
     <RN.View style={{ flex: 1, backgroundColor: colors.background }}>
       <Header
-        title="Criar chamada"
+        title={eventData ? "Editar chamada" : "Criar chamada"}
         onPressBack={goBack}
         bgColor="primary"
         color="white"
@@ -46,7 +50,7 @@ const CreateCallScreenContent = () => {
       <StepIndicators />
 
       <RN.Animated.View
-        className="flex-1 mt-8 mb-11 px-6"
+        className="flex-1 mt-6 mb-11 px-6"
         style={animatedContentStyles}
       >
         {renderStepContent()}
@@ -54,19 +58,11 @@ const CreateCallScreenContent = () => {
 
       <BottomNavigation />
 
-      <Modal.Root>
-        <Modal.Content visible={false}>
-          <Modal.Logo>
-            <CheckLogo width={100} />
-          </Modal.Logo>
-
-          <Modal.Title>Chamada criada com sucesso!</Modal.Title>
-
-          <Button styleRest={{ marginTop: 10, height: height * 0.047 }}>
-            <Text className="font-poppinsSemiBold text-white">Continuar</Text>
-          </Button>
-        </Modal.Content>
-      </Modal.Root>
+      <Toast
+        message="Chamada criada com sucesso!"
+        onHide={() => setVisibleToast(false)}
+        visible={visibleToast}
+      />
     </RN.View>
   );
 };
