@@ -16,6 +16,8 @@ import {
 import { colors } from "@styles/colors";
 import RootNavigator from "@navigation/index";
 import SplashScreen from "features/splash/SplashScreen";
+import { useAuthStore } from "@features/auth/presentation/stores/authStore";
+import useCheckForUpdate from "@hooks/useCheckForUpdate";
 
 enum AppState {
   Loading,
@@ -35,14 +37,19 @@ export default function App() {
     Rubik_700Bold: FontRubik.Rubik_700Bold,
   });
 
+  useCheckForUpdate();
+
   const queryClient = new QueryClient();
+
+  const { loadUserFromStorage } = useAuthStore();
 
   const [appState, setAppState] = useState<AppState>(AppState.Loading);
 
   const initApp = () => {
+    setTimeout(() => setAppState(AppState.Main), 3000);
+    loadUserFromStorage();
     setBackgroundColorAsync(colors.background);
     setButtonStyleAsync("dark");
-    setTimeout(() => setAppState(AppState.Main), 2650);
   };
 
   useEffect(() => initApp(), []);
