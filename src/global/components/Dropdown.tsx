@@ -17,11 +17,11 @@ import {
   Merge,
   useController,
 } from "react-hook-form";
-import { OfficeValue } from "@features/auth/contents/RegisterContent";
+import { OfficeValue } from "@features/auth/presentation/contents/RegisterContent";
 
 export interface IDropdownValues {
   gender?: GenderValue | null;
-  voiceType?: VoiceValue | null;
+  suit?: VoiceValue | null;
   baptized?: BaptizedValue | null;
   callType?: CallValue | null;
   office?: OfficeValue | null;
