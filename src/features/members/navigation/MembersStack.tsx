@@ -21,7 +21,7 @@ const MembersStack = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="RegisterMember" component={RegisterMemberScreen} />
+      <Stack.Screen name="RegisterMember" component={RegisterMemberScreen}  />
     </Stack.Navigator>
   );
 };
