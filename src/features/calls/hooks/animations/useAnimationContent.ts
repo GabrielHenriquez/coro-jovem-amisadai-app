@@ -1,4 +1,4 @@
-import useCreateCallContext from "@features/calls/contexts/CreateCallContext";
+import { useCreateCallContext } from "@features/calls/contexts/CreateCallContext";
 import { useEffect, useRef } from "react";
 import { Animated } from "react-native";
 

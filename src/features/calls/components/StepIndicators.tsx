@@ -2,7 +2,7 @@ import Text from "@components/Text";
 import { colors } from "@styles/colors";
 import React, { useEffect, useRef } from "react";
 import { View, Animated, ViewStyle } from "react-native";
-import useCreateCallContext from "../contexts/CreateCallContext";
+import { useCreateCallContext } from "../contexts/CreateCallContext";
 
 const sharedStyle: ViewStyle = {
   height: 10,
