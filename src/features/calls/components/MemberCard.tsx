@@ -1,31 +1,39 @@
 import * as RN from "react-native";
 import Text from "@components/Text";
 import { colors } from "@styles/colors";
+import { IMember } from "@features/members/domain/entities/Member";
+import { useCreateCallContext } from "../contexts/CreateCallContext";
 
 const MemberCard = ({
-  onPress,
-  isSelected,
+  item,
 }: {
+  item: IMember;
   onPress?: VoidFunction;
   isSelected: boolean;
 }) => {
+  const { validateIsActive, handleItemSelected } = useCreateCallContext();
+  const isSelected = validateIsActive(item?.id);
   return (
     <RN.TouchableOpacity
       style={{
         borderWidth: 1.5,
-        borderColor: isSelected ? "#7b8d75" : "#CCC",
+        borderColor: isSelected ? "#ffffff" : "#CCC",
         paddingVertical: 5,
-        backgroundColor: isSelected ? "#7b8d75" : colors.white,
+        backgroundColor: isSelected ? "#7f917c" : colors.white,
         gap: 18,
       }}
       className="px-5 rounded-2xl flex-row items-center"
+      onPress={() => handleItemSelected(item)}
     >
       <RN.View
         style={{
           borderRadius: 30,
           width: 12,
           height: 28,
-          backgroundColor: "#3364df",
+          backgroundColor:
+            item?.gender === "Masculino"
+              ? colors.blueGender
+              : colors.pinkGender,
         }}
         className="bg-blue"
       />
@@ -33,11 +41,11 @@ const MemberCard = ({
       <RN.View className="gap-3 flex-row items-center">
         <RN.Image
           source={{
-            uri: "https://firebasestorage.googleapis.com/v0/b/coro-jovem-amisadai.appspot.com/o/component-Gabriel%20Henrique%20Soares-002684712%2FprofileImage?alt=media&token=188f4a75-42e6-4a55-9322-56e10cbc36dc",
+            uri: item?.profileImageUri,
           }}
           style={{
-            width: 37,
-            height: 37,
+            width: 38,
+            height: 38,
             borderRadius: 30,
             borderWidth: 1,
             borderColor: isSelected ? colors.white : colors.gray2,
@@ -51,7 +59,7 @@ const MemberCard = ({
               isSelected ? "text-white" : "text-black"
             }`}
           >
-            Gabriel Henrique
+            {item?.name}
           </Text>
 
           {/*  <RN.View className="flex-row gap-1.5 items-center right-0.5">
