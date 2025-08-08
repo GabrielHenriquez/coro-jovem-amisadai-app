@@ -2,21 +2,26 @@ import { View, TouchableOpacity } from "react-native";
 import { colors } from "@styles/colors";
 import Text from "@components/Text";
 import { Music4 } from "lucide-react-native";
+import { useCreateCallContext } from "../contexts/CreateCallContext";
 
-const SongCard = () => {
+const SongCard = ({ item }: { item: string }) => {
+  const { validateIsActiveMusic, handleMusicSelected } = useCreateCallContext();
+  const isSelected = validateIsActiveMusic(item);
+
   return (
     <TouchableOpacity
       style={{
         paddingVertical: 8,
         borderWidth: 1,
         borderColor: "#CCC",
-        backgroundColor: 3 === 3 ? "#7b8d75" : colors.white,
+        backgroundColor: isSelected ? "#7f917c" : colors.white,
       }}
       className="px-4 rounded-2xl flex-row items-center"
+      onPress={() => handleMusicSelected(item)}
     >
       <View className="gap-4 flex-row items-center">
         <Music4
-          color={3 === 3 ? colors.white : colors.primary}
+          color={isSelected ? colors.white : colors.primary}
           strokeWidth={2.5}
         />
 
@@ -24,10 +29,10 @@ const SongCard = () => {
           <Text
             size={17}
             className={`font-poppinsSemiBold leading-none ${
-              3 === 3 ? "text-white" : "text-primary"
+              isSelected ? "text-white" : "text-primary"
             }`}
           >
-            ETERNO REI
+            {item}
           </Text>
         </View>
       </View>

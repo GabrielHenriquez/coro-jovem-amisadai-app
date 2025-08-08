@@ -1,10 +1,10 @@
 import { FlatList } from "react-native";
 import MemberCard from "./MemberCard";
-import useCreateCallContext from "../contexts/CreateCallContext";
+import { useCreateCallContext } from "../contexts/CreateCallContext";
 
 const MembersList = () => {
   const { membersData } = useCreateCallContext();
-  console.log("MembersList membersData", membersData);
+
   return (
     <FlatList
       data={membersData}
@@ -14,7 +14,7 @@ const MembersList = () => {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ gap: 8, paddingBottom: 5 }}
       keyExtractor={(_, index) => index.toString()}
-      renderItem={({ index }) => <MemberCard isSelected={false} />}
+      renderItem={({ item }) => <MemberCard item={item} isSelected={false} />}
     />
   );
 };
