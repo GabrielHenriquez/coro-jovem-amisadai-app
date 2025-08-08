@@ -4,17 +4,23 @@ import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@styles/colors";
 import { View } from "react-native";
-import useCreateCallContext from "../contexts/CreateCallContext";
+import { useCreateCallContext } from "../contexts/CreateCallContext";
+
 
 const BottomNavigation = () => {
   const formValidator = useFormContext();
-  const { step, setStep } = useCreateCallContext();
+  const { step, setStep, onSubmit, setDataForm, isLoading } =
+    useCreateCallContext();
   const insets = useSafeAreaInsets();
   const showBackButton = step > 0;
   const handleNext = formValidator.handleSubmit(
     (data) => {
-      console.log("✅ Válido:", data);
-      setStep((prev) => prev + 1);
+      if (step >= 2) {
+        onSubmit();
+      } else {
+        if (step === 0) setDataForm(data);
+        setStep((prev) => prev + 1);
+      }
     },
     (errors) => {
       console.log("❌ Erros de validação:", errors);
@@ -48,7 +54,7 @@ const BottomNavigation = () => {
       )}
 
       <View style={{ flex: showBackButton ? 0.85 : 1 }}>
-        <Button onPress={handleNext}>
+        <Button onPress={handleNext} activeLoading={isLoading}>
           <Text size={18} className="font-poppinsSemiBold text-white">
             {getLabelButton[step]}
           </Text>
