@@ -3,10 +3,11 @@ import {
   NativeStackNavigationProp,
 } from "@react-navigation/native-stack";
 import RegisterMemberScreen from "../screens/RegisterMemberScreen";
+import { IMember } from "../domain/entities/Member";
 
 export type MembersStackParamList = {
-  Members: undefined;
-  RegisterMember: undefined;
+  Members: IMember[];
+  RegisterMember: { member?: IMember };
 };
 
 export type MembersNavigationProp =
@@ -21,7 +22,7 @@ const MembersStack = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="RegisterMember" component={RegisterMemberScreen}  />
+      <Stack.Screen name="RegisterMember" component={RegisterMemberScreen} />
     </Stack.Navigator>
   );
 };
