@@ -15,6 +15,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "global/configs/firebase";
 import { formatDateToUS } from "@utils/date";
 import { useNavigation } from "@react-navigation/native";
+import { DB_COLLECTIONS } from "@utils/DB_collections";
 
 interface CreateCallContextType {
   step: number;
@@ -55,7 +56,7 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
 
   const getSongs = async () => {
     try {
-      const snapshot = await getDocs(collection(db, "musics"));
+      const snapshot = await getDocs(collection(db, DB_COLLECTIONS?.musics));
       return snapshot.docs
         .map((doc) => doc.data()?.music)
         .filter(Boolean)

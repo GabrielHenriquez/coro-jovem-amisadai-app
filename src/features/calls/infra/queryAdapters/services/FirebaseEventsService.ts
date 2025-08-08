@@ -13,11 +13,11 @@ import {
   IEventCard,
 } from "../../../domain/entities/Events";
 import { db } from "global/configs/firebase";
-import { IMember } from "@features/members/domain/entities/Member";
+import { DB_COLLECTIONS } from "@utils/DB_collections";
 
 export class FirebaseEventsService implements IEventsRepository {
   async getDots() {
-    const ref = collection(db, "dots");
+    const ref = collection(db, DB_COLLECTIONS.dots);
     const snapshot = await getDocs(ref);
     return snapshot.docs.map((doc) => doc.data());
   }
@@ -33,7 +33,7 @@ export class FirebaseEventsService implements IEventsRepository {
   }
 
   async getEvents(): Promise<IEventCard[]> {
-    const ref = collection(db, "eventsCard");
+    const ref = collection(db, DB_COLLECTIONS.eventsCard);
     const snapshot = await getDocs(ref);
     return snapshot.docs.map((doc) => {
       const data = doc.data();
@@ -47,7 +47,7 @@ export class FirebaseEventsService implements IEventsRepository {
   }
 
   async getEventsBirthDate(): Promise<IEventBirthDateCard[]> {
-    const ref = collection(db, "eventsBirthDateCard");
+    const ref = collection(db, DB_COLLECTIONS.eventsBirthDateCard);
     const snapshot = await getDocs(ref);
     return snapshot.docs.map((doc) => {
       const data = doc.data();

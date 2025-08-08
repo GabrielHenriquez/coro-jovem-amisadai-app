@@ -13,10 +13,11 @@ import { db, storage } from "global/configs/firebase";
 import { IMember } from "../entities/Member";
 import { FormDataRegisterMember } from "@features/members/hooks/forms/useFormRegisterMember";
 import { deleteObject, ref } from "firebase/storage";
+import { DB_COLLECTIONS } from "@utils/DB_collections";
 
 export const FirebaseMemberService = {
   createMember: async (memberData: FormDataRegisterMember): Promise<void> => {
-    const collectionRef = collection(db, "components");
+    const collectionRef = collection(db, DB_COLLECTIONS.components);
     await addDoc(collectionRef, memberData);
   },
 
@@ -31,7 +32,7 @@ export const FirebaseMemberService = {
     profileImageUri: string;
   }): Promise<void> => {
     console.log(member);
-    const docRef = doc(db, "components", member?.id);
+    const docRef = doc(db, DB_COLLECTIONS.components, member?.id);
     const imageRef = ref(
       storage,
       `component-${member?.name}-${member?.memberCard}/profileImage`
@@ -41,7 +42,7 @@ export const FirebaseMemberService = {
   },
 
   getMembers: async (): Promise<IMember[]> => {
-    const collectionRef = collection(db, "components");
+    const collectionRef = collection(db, DB_COLLECTIONS.components);
     const q = query(collectionRef, orderBy("name"));
 
     const querySnapshot = await getDocs(q);
@@ -58,7 +59,7 @@ export const FirebaseMemberService = {
     return [];
   },
   getMember: async (uid: string): Promise<IMember | {}> => {
-    const docRef = doc(db, "components", uid);
+    const docRef = doc(db, DB_COLLECTIONS.components, uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists())
       return { ...docSnap.data(), id: docSnap?.id } as IMember;
