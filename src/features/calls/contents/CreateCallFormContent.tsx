@@ -11,14 +11,38 @@ import {
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 import { useFormContext } from "react-hook-form";
+import { useCallback } from "react";
+import { IEvent } from "../domain/entities/Events";
+import { formatDateToBR } from "./../../members/utils/formatDate";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCreateCallContext } from "../contexts/CreateCallContext";
 
 export type CallValue = "Local" | "Saída";
 
-const CreateCallFormContent = () => {
+const CreateCallFormContent = ({ eventData }: { eventData: IEvent }) => {
   const formValidator = useFormContext();
   const { errors } = formValidator.formState;
-  const { watch } = formValidator;
+  const { watch, setValue } = formValidator;
+  const { setMembersSelected, setSongsSelected, setEventID } =
+    useCreateCallContext();
   const callType = watch("callType");
+
+  useFocusEffect(
+    useCallback(() => {
+      if (eventData) {
+        setTimeout(() => {
+          setValue("cult", eventData?.cult);
+          setValue("hour", eventData?.hour);
+          setValue("date", formatDateToBR(eventData?.date));
+          setValue("namePreacher", eventData?.namePreacher);
+          setValue("callType", eventData?.type);
+          setMembersSelected(eventData?.components);
+          setSongsSelected(eventData?.musics);
+          setEventID(eventData?.numberSearchDoc);
+        }, 350);
+      }
+    }, [eventData])
+  );
 
   return (
     <KeyboardAvoidingView
