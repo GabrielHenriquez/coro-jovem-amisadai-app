@@ -3,8 +3,15 @@ import React from "react";
 import Text from "@components/Text";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { Clock } from "lucide-react-native";
+import { IEvent } from "../domain/entities/Events";
 
-const EventCard = ({ onPress }: { onPress: VoidFunction }) => {
+const EventCard = ({
+  onPress,
+  event,
+}: {
+  onPress: VoidFunction;
+  event: IEvent;
+}) => {
   return (
     <RN.TouchableOpacity
       style={{
@@ -14,16 +21,17 @@ const EventCard = ({ onPress }: { onPress: VoidFunction }) => {
         gap: 18,
       }}
       onPress={onPress}
-      className="flex-row items-center mt-3 py-3 px-4 bg-white rounded-xl"
+      className="flex-row items-center mt-3 py-2.5 px-4 bg-white rounded-xl"
     >
       <RN.View
         style={{
           borderRadius: 30,
           width: 16.5,
+          backgroundColor: event?.type === "Saída" ? "#BD2D2D" : "#32C0CA",
         }}
-        className="h-12  bg-red-600"
+        className="h-12"
       />
-      <RN.View className="gap-2">
+      <RN.View className="gap-1.5">
         <Text className="font-poppinsSemiBold">
           Chamada - Coro Jovem Amisadai
         </Text>
@@ -31,14 +39,14 @@ const EventCard = ({ onPress }: { onPress: VoidFunction }) => {
         <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
           <Feather size={14} name="book-open" />
           <Text size={14} className="font-poppinsMedium text-grayDark">
-            Culto: Pregação
+            Culto: {event?.cult}
           </Text>
         </RN.View>
 
         <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
           <Clock size={14} />
           <Text size={14} className="font-poppinsMedium  text-grayDark">
-            Horário: 19h30
+            Horário: {event?.hour}
           </Text>
         </RN.View>
       </RN.View>
