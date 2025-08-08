@@ -28,7 +28,11 @@ export const colors = {
   primary: "#4C5E46",
 
   redDark: "#D21D1D",
+  redEvent: "#BD2D2D",
+  blueEvent: "#32C0CA",
   redLight: "#FFC4C4",
+  pinkGender: "#C54186",
+  blueGender: "#4167C5",
 
   background: "#D9E2CF",
   white: "#FFFFFF",
