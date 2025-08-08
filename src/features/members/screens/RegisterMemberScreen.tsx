@@ -1,9 +1,10 @@
 import * as RN from "react-native";
 import { Button, Dropdown, Header, Input, Text } from "@components/index";
 import { colors } from "@styles/colors";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   CalendarDaysIcon,
+  Camera,
   Flame,
   IdCard,
   LocationEdit,
@@ -13,11 +14,13 @@ import {
   User,
 } from "lucide-react-native";
 import useFormRegisterMember from "../hooks/forms/useFormRegisterMember";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { UploadProfilePhoto } from "@assets/images";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import axios from "axios";
 import { useDebounce } from "use-debounce";
+import useRegisterMember from "../hooks/useRegisterMember";
+import Toast from "@components/Toast/view";
 
 export type GenderValue = "Masculino" | "Feminino" | null;
 export type VoiceValue =
@@ -31,7 +34,10 @@ export type BaptizedValue = "Sim" | "Não" | null;
 
 const RegisterMemberScreen = () => {
   const { goBack } = useNavigation();
+  const route = useRoute();
+  const member = route?.params?.member;
   const FORM = useFormRegisterMember();
+  const VM = useRegisterMember({ isEdit: member?.id });
 
   const handleGetAddressByZipCode = async (zipCode: string) => {
     try {
@@ -60,7 +66,7 @@ const RegisterMemberScreen = () => {
             shouldValidate: true,
           });
           FORM.setValue("city", address.localidade, { shouldValidate: true });
-          FORM.setValue("state", address.uf, { shouldValidate: true });
+          FORM.setValue("uf", address.uf, { shouldValidate: true });
         }
       }
     };
@@ -68,7 +74,24 @@ const RegisterMemberScreen = () => {
     fetchAddress();
   }, [debouncedZipCode]);
 
-  useFocusEffect(useCallback(() => FORM.reset(), []));
+  useEffect(() => {
+    if (!member) {
+      FORM.reset();
+      VM.setProfileImage("");
+    } else {
+      FORM.setValue("name", member?.name);
+      FORM.setValue("phone", member?.phone);
+      FORM.setValue("birthDate", member?.birthDate);
+      FORM.setValue("gender", member?.gender);
+      FORM.setValue("baptized", member?.baptized);
+      FORM.setValue("memberCard", member?.memberCard);
+      FORM.setValue("suit", member?.suit);
+      FORM.setValue("zipCode", member?.zipCode);
+      FORM.setValue("number", member?.number);
+      FORM.setValue("complement", member?.complement);
+      VM.setProfileImage(member?.profileImageUri);
+    }
+  }, [member]);
 
   return (
     <RN.View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -76,7 +99,7 @@ const RegisterMemberScreen = () => {
         bgColor="primary"
         onPressBack={goBack}
         color="white"
-        title="Cadastrar componente"
+        title={member?.id ? "Editar componente" : "Cadastrar componente"}
       />
 
       <KeyboardAwareScrollView
@@ -88,11 +111,46 @@ const RegisterMemberScreen = () => {
         keyboardShouldPersistTaps="handled"
         bottomOffset={50}
       >
-        <RN.TouchableOpacity className="w-36 h-36 self-center mt-10">
-          <RN.Image
-            source={UploadProfilePhoto}
-            style={{ width: "100%", height: "100%" }}
-          />
+        <RN.TouchableOpacity
+          className="w-36 h-36 self-center mt-10"
+          onPress={VM.openImagePickerAsync}
+        >
+          <RN.View
+            style={{
+              borderRadius: 72,
+              overflow: "hidden",
+              position: "relative",
+            }}
+          >
+            <RN.Image
+              source={
+                !VM.profileImage ? UploadProfilePhoto : { uri: VM.profileImage }
+              }
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+              resizeMode="cover"
+            />
+
+            {VM?.profileImage && (
+              <RN.View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  width: "100%",
+                  height: 40,
+                  backgroundColor: "#ffffff42",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderBottomLeftRadius: 72,
+                  borderBottomRightRadius: 72,
+                }}
+              >
+                <Camera color={"#ffffff"} />
+              </RN.View>
+            )}
+          </RN.View>
         </RN.TouchableOpacity>
 
         <RN.View className="gap-5 my-11">
@@ -190,9 +248,9 @@ const RegisterMemberScreen = () => {
           </Input.Root>
 
           <Dropdown
-            name="voiceType"
+            name="suit"
             control={FORM.control}
-            error={FORM.errors.voiceType!}
+            error={FORM.errors.suit!}
             placeholder="Selecione um naipe"
             data={["Contralto", "1º Soprano", "2º Soprano"]}
             icon={<MicIcon strokeWidth={2.5} color={"#FFF"} size={23} />}
@@ -280,10 +338,22 @@ const RegisterMemberScreen = () => {
           </RN.View>
         </RN.View>
 
-        <Button onPress={FORM.handleSubmit((data) => console.log(data))}>
+        <Button
+          onPress={FORM.handleSubmit(VM.onSubmit)}
+          activeLoading={VM?.isLoading}
+        >
           <Text className="font-poppinsSemiBold text-white">Cadastrar</Text>
         </Button>
       </KeyboardAwareScrollView>
+      <Toast
+        message={
+          member?.id
+            ? "Componente editado com sucesso!"
+            : "Componente criado com sucesso!"
+        }
+        onHide={() => VM?.setVisibleToast(false)}
+        visible={VM?.visibleToast}
+      />
     </RN.View>
   );
 };
