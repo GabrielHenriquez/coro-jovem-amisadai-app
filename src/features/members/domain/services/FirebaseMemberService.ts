@@ -22,7 +22,10 @@ export const FirebaseMemberService = {
   },
 
   updateMember: async (memberData: FormDataRegisterMember): Promise<void> => {
-    await setDoc(doc(db, "components", memberData?.id), memberData);
+    await setDoc(
+      doc(db, DB_COLLECTIONS.components, memberData?.id),
+      memberData
+    );
   },
 
   deleteMember: async (member: {

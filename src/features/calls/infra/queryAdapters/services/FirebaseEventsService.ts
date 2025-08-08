@@ -23,7 +23,7 @@ export class FirebaseEventsService implements IEventsRepository {
   }
 
   async getEvent(eventId: string): Promise<IEvent> {
-    const docRef = doc(db, "events", eventId);
+    const docRef = doc(db, DB_COLLECTIONS.events, eventId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       return docSnap.data() as IEvent;
@@ -67,7 +67,7 @@ export class FirebaseEventsService implements IEventsRepository {
     eventId: string;
     data: IEvent;
   }): Promise<void> {
-    await setDoc(doc(db, "events", eventId), data);
+    await setDoc(doc(db, DB_COLLECTIONS.events, eventId), data);
   }
 
   async createEventCard({
@@ -77,7 +77,7 @@ export class FirebaseEventsService implements IEventsRepository {
     eventId: string;
     data: IEventCard;
   }): Promise<void> {
-    await setDoc(doc(db, "eventsCard", eventId), data);
+    await setDoc(doc(db, DB_COLLECTIONS.eventsCard, eventId), data);
   }
 
   async createDotToEventInDB({
@@ -89,7 +89,7 @@ export class FirebaseEventsService implements IEventsRepository {
     color: string;
     date: string;
   }): Promise<void> {
-    const dotRef = doc(db, "dots", date);
+    const dotRef = doc(db, DB_COLLECTIONS.dots, date);
     const querySnapshot = await getDoc(dotRef);
     const newDot = {
       key,
@@ -104,14 +104,14 @@ export class FirebaseEventsService implements IEventsRepository {
 
       const newDots = [...currentDots, newDot];
       dataResponse[date].dots = newDots;
-      await setDoc(doc(db, "dots", date), dataResponse);
+      await setDoc(doc(db, DB_COLLECTIONS.dots, date), dataResponse);
     } else {
       const schemaDot = {
         [date]: {
           dots: [newDot],
         },
       };
-      await setDoc(doc(db, "dots", date), schemaDot);
+      await setDoc(doc(db, DB_COLLECTIONS.dots, date), schemaDot);
     }
   }
 
@@ -122,7 +122,7 @@ export class FirebaseEventsService implements IEventsRepository {
     key: string;
     date: string;
   }): Promise<void> {
-    const dotRef = doc(db, "dots", date);
+    const dotRef = doc(db, DB_COLLECTIONS.dots, date);
     const querySnapshot = await getDoc(dotRef);
     const keyDotToRemove = {
       key,
@@ -140,16 +140,16 @@ export class FirebaseEventsService implements IEventsRepository {
 
         const newDots = filterToRemoveDot;
         dataResponse[date].dots = newDots;
-        await setDoc(doc(db, "dots", date), dataResponse);
+        await setDoc(doc(db, DB_COLLECTIONS.dots, date), dataResponse);
       } else if (dataResponse[date]?.dots.length === 1) {
-        await deleteDoc(doc(db, "dots", date));
+        await deleteDoc(doc(db, DB_COLLECTIONS.dots, date));
       }
     }
   }
 
   async deleteEvent(eventId: string): Promise<void> {
-    const docRef = doc(db, "events", eventId);
-    const docCardRef = doc(db, "eventsCard", eventId);
+    const docRef = doc(db, DB_COLLECTIONS.events, eventId);
+    const docCardRef = doc(db, DB_COLLECTIONS.eventsCard, eventId);
     await Promise.all([deleteDoc(docRef), deleteDoc(docCardRef)]);
   }
 }
