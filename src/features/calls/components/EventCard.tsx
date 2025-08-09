@@ -3,14 +3,14 @@ import React from "react";
 import Text from "@components/Text";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { Clock } from "lucide-react-native";
-import { IEvent } from "../domain/entities/Events";
+import { IEventCard } from "../domain/entities/Events";
 
 const EventCard = ({
   onPress,
   event,
 }: {
   onPress: VoidFunction;
-  event: IEvent;
+  event: IEventCard;
 }) => {
   return (
     <RN.TouchableOpacity
@@ -38,15 +38,15 @@ const EventCard = ({
 
         <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
           <Feather size={14} name="book-open" />
-          <Text size={14} className="font-poppinsMedium text-grayDark">
-            Culto: {event?.cult}
+          <Text numberOfLines={1} size={14} className="font-poppinsMedium text-grayDark flex-1">
+            Culto: {event?.cult || "Não informado"}
           </Text>
         </RN.View>
 
         <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
           <Clock size={14} />
           <Text size={14} className="font-poppinsMedium  text-grayDark">
-            Horário: {event?.hour}
+            Horário: {event?.hour || "Não informado"}
           </Text>
         </RN.View>
       </RN.View>
