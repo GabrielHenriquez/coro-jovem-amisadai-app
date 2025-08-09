@@ -14,7 +14,7 @@ function SearchInput({
     <RN.View style={[styles.container, { ...styleRest }]}>
       <RN.View style={styles.contentInput}>
         <RN.View style={[styles.areaIcon, { marginRight: 0, marginLeft: 4 }]}>
-          <Search color={colors.primary} />
+          <Search color={colors.primary} size={22} strokeWidth={2.5} />
         </RN.View>
 
         <RN.TextInput

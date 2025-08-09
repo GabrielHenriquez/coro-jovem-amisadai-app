@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   toggleButton: {
-    height: 30,
-    width: 30,
+    height: 28,
+    width: 28,
     backgroundColor: "#FFF",
     borderRadius: 17,
     alignSelf: "center",
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   today: {
     color: "#F06543",
-    fontWeight: "bold",
+    fontFamily: "Rubik_600SemiBold",
   },
   daySelected: {
     backgroundColor: "#F06543",
