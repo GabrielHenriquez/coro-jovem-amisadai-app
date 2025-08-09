@@ -87,11 +87,13 @@ export const MainTabs = () => {
             if (screenFocused === "Calls")
               navigation.navigate("CallsNavigation", {
                 screen: "CreateCall",
+                params: undefined,
               });
 
             if (screenFocused === "Members")
               navigation.navigate("MembersNavigation", {
                 screen: "RegisterMember",
+                params: { member: undefined },
               });
           }}
         />
