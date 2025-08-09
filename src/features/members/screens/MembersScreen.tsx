@@ -3,15 +3,16 @@ import { colors } from "@styles/colors";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDebounce } from "use-debounce";
+import { useMemberStore } from "../stores/membersStore";
+import { IMember } from "../domain/entities/Member";
 import Toast from "@components/Toast/view";
 import MemberCard from "../components/MemberCard";
 import MemberPreview from "../components/MemberPreview";
 import useMembers from "../hooks/useMembers";
+import ScrollToTopButton from "../components/ScrollTopTopButton";
 import * as Component from "@components/index";
 import * as RN from "react-native";
-import { useMemberStore } from "../stores/membersStore";
-import { IMember } from "../domain/entities/Member";
-import ScrollToTopButton from "../components/ScrollTopTopButton";
+import { getHeight } from "@utils/index";
 
 // Constants
 const SCROLL_THRESHOLD = 400;
@@ -20,7 +21,9 @@ const Members = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 450);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
-
+  const [hasMemberToDelete, setHasMemberToDelete] = useState<IMember | null>(
+    null
+  );
   const flatListRef = useRef<RN.FlatList>(null);
   const scrollYRef = useRef(0);
 
@@ -68,7 +71,12 @@ const Members = () => {
     );
   }, [data, debouncedSearchTerm]);
 
-  useFocusEffect(useCallback(() => scrollToTop(), [scrollToTop]));
+  useFocusEffect(
+    useCallback(() => {
+      if (scrollYRef.current !== 0) scrollToTop();
+      if (debouncedSearchTerm) setSearchTerm("");
+    }, [scrollToTop])
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.primary }}>
@@ -131,7 +139,7 @@ const Members = () => {
           {memberSelected && (
             <MemberPreview
               memberPressed={memberSelected}
-              handleDeleteMember={handleDeleteMember}
+              handleDeleteMember={() => setHasMemberToDelete(memberSelected)}
             />
           )}
         </Component.BaseBottomSheet>
@@ -144,6 +152,33 @@ const Members = () => {
         onHide={() => setVisibleToast(false)}
         visible={visibleToast}
       />
+
+      <Component.Modal.Root>
+        <Component.Modal.Content visible={!!hasMemberToDelete}>
+          <Component.Modal.AreaCloseModal
+            onClose={() => setHasMemberToDelete(null)}
+          />
+          <Component.Spacer height={16} />
+          <Component.Modal.Title>
+            Tem certeza que deseja excluir?
+          </Component.Modal.Title>
+          <Component.Modal.Subtitle>
+            Essa ação não pode ser desfeita.
+          </Component.Modal.Subtitle>
+          <Component.Button
+            styleRest={{ height: getHeight * 0.048 }}
+            bgColor="redDark"
+            onPress={() => {
+              setHasMemberToDelete(null);
+              handleDeleteMember(hasMemberToDelete as IMember);
+            }}
+          >
+            <Component.Text className="text-white font-poppinsSemiBold">
+              Excluir
+            </Component.Text>
+          </Component.Button>
+        </Component.Modal.Content>
+      </Component.Modal.Root>
     </SafeAreaView>
   );
 };
