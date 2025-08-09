@@ -70,7 +70,7 @@ const Members = () => {
         <RN.View className="gap-4 px-4">
           <Component.Text
             className="text-center font-poppinsBold text-primary"
-            size={26}
+            size={24}
           >
             Componentes
           </Component.Text>
@@ -82,7 +82,9 @@ const Members = () => {
           />
 
           <Component.Text className="text-center font-poppinsSemiBold text-gray">
-            Quantidade de componentes: {data?.length}
+            {searchTerm && filteredMembers?.length === 0
+              ? "Nenhum componente encontrado"
+              : `Quantidade de componentes: ${filteredMembers?.length}`}
           </Component.Text>
         </RN.View>
 
