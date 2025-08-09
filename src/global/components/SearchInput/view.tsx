@@ -30,7 +30,10 @@ function SearchInput({
         {searchTerm && (
           <RN.TouchableOpacity
             className="px-3"
-            onPress={() => setSearchTerm("")}
+            onPress={() => {
+              setSearchTerm("");
+              RN.Keyboard.dismiss();
+            }}
           >
             <X color={colors.gray} />
           </RN.TouchableOpacity>
