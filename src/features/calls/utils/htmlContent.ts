@@ -130,7 +130,7 @@ const htmlContent = (event: IEvent) => {
         </div>
 
         <div class="info-grid">
-            <div><strong>Data:</strong> 20/04/2025</div>
+            <div><strong>Data:</strong> ${formatDateToBR(event?.date)}</div>
             <div><strong>Horário:</strong> ${event?.hour}</div>
             <div><strong>Escalado:</strong> ${
               event?.namePreacher ?? "Não informado"
