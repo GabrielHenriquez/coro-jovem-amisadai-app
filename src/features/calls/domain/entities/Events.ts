@@ -1,6 +1,9 @@
 export interface IEventCard {
   id: string;
   title: string;
+  type: string;
+  cult: string;
+  hour: string;
   date: string;
   [key: string]: any;
 }
@@ -11,15 +14,13 @@ export interface IEvent {
   cult: string;
   hour: string;
   namePreacher: string;
-  officePreacher: string;
+  officePreacher?: string;
   scheduleBy: string;
   date: string;
   local: string;
-  components: [{ name: string; id: string; gender: string; suit: string }];
+  components: Array<{ name: string; id: string; gender: string; suit: string }>;
   musics: string[];
-  missingComponents: [
-    { name: string; id: string; gender: string; suit: string }
-  ];
+  missingComponents: Array<{ name: string; id: string; gender: string; suit: string }>;
   numberSearchDoc: number;
 }
 
