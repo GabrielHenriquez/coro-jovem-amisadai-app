@@ -76,7 +76,9 @@ export default function AnimatedDropdown<T extends keyof IDropdownValues>({
     inputRange: [0, 1],
     outputRange: [
       0,
-      data?.length < 4 ? data?.length * responsiveSize(48) : 160,
+      data?.length < 4
+        ? data?.length * responsiveSize(42)
+        : responsiveSize(168),
     ],
   });
 
@@ -160,7 +162,9 @@ export default function AnimatedDropdown<T extends keyof IDropdownValues>({
                   />
                 )}
 
-                <Text className="font-poppinsSemiBold text-black">{item}</Text>
+                <Text size={14} className="font-poppinsSemiBold text-black">
+                  {item}
+                </Text>
               </RN.TouchableOpacity>
             );
           }}
@@ -200,7 +204,7 @@ const styles = RN.StyleSheet.create({
     zIndex: 1000,
   },
   option: {
-    height: responsiveSize(46),
+    height: responsiveSize(42),
     paddingHorizontal: 16,
     borderBottomWidth: 0.5,
     borderColor: colors.gray,
