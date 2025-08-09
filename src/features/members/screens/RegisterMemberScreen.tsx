@@ -1,7 +1,11 @@
 import * as RN from "react-native";
 import { Button, Dropdown, Header, Input, Text } from "@components/index";
 import { colors } from "@styles/colors";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
 import {
   CalendarDaysIcon,
   Camera,
@@ -14,46 +18,317 @@ import {
   User,
 } from "lucide-react-native";
 import useFormRegisterMember from "../hooks/forms/useFormRegisterMember";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { UploadProfilePhoto } from "@assets/images";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import axios from "axios";
 import { useDebounce } from "use-debounce";
 import useRegisterMember from "../hooks/useRegisterMember";
 import Toast from "@components/Toast/view";
+import { IMember } from "../domain/entities/Member";
 
+// Types
 export type GenderValue = "Masculino" | "Feminino" | null;
 export type VoiceValue =
   | "Contralto"
   | "1º Soprano"
   | "2º Soprano"
   | "Baixo"
-  | "Tenor"
+  | "Barítono"
+  | "1º Tenor"
+  | "2º Tenor"
   | null;
 export type BaptizedValue = "Sim" | "Não" | null;
 
+interface RouteParams {
+  member?: IMember;
+}
+
+// Constants
+const MALE_VOICES: VoiceValue[] = ["Baixo", "Barítono", "1º Tenor", "2º Tenor"];
+const FEMALE_VOICES: VoiceValue[] = ["Contralto", "1º Soprano", "2º Soprano"];
+const GENDERS: ("Masculino" | "Feminino")[] = ["Masculino", "Feminino"];
+const BAPTIZED_OPTIONS: ("Sim" | "Não")[] = ["Sim", "Não"];
+
+// Utility functions
+const handleGetAddressByZipCode = async (zipCode: string) => {
+  try {
+    const response = await axios.get(
+      `https://viacep.com.br/ws/${zipCode}/json/`
+    );
+    const { logradouro, uf, bairro, localidade } = response?.data;
+    return { logradouro, uf, bairro, localidade };
+  } catch (error) {
+    console.log("Erro ao buscar CEP");
+    return null;
+  }
+};
+
+// Components
+const ProfileImageSection: React.FC<{
+  profileImage: string;
+  onPress: () => void;
+}> = ({ profileImage, onPress }) => (
+  <RN.TouchableOpacity
+    className="w-32 h-32 self-center mt-10"
+    onPress={onPress}
+  >
+    <RN.View
+      style={{
+        borderRadius: profileImage ? 72 : 0,
+        overflow: "hidden",
+        position: "relative",
+      }}
+    >
+      {!profileImage ? (
+        <RN.Image
+          source={UploadProfilePhoto as RN.ImageSourcePropType}
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+          resizeMode="cover"
+        />
+      ) : (
+        <RN.Image
+          source={{ uri: profileImage }}
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+          resizeMode="cover"
+        />
+      )}
+
+      {profileImage && (
+        <RN.View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            width: "100%",
+            height: 40,
+            backgroundColor: "#ffffff42",
+            justifyContent: "center",
+            alignItems: "center",
+            borderBottomLeftRadius: 72,
+            borderBottomRightRadius: 72,
+          }}
+        >
+          <Camera color={"#ffffff"} />
+        </RN.View>
+      )}
+    </RN.View>
+  </RN.TouchableOpacity>
+);
+
+const PersonalInfoSection: React.FC<{
+  form: any;
+  errors: any;
+  suitData: VoiceValue[];
+}> = ({ form, errors, suitData }) => (
+  <RN.View className="gap-5">
+    <Input.Root>
+      <Input.Content
+        icon={<User size={25} strokeWidth={2.5} color={"#FFFFFF"} />}
+        errors={errors.name!}
+      >
+        <Input.TextInput
+          name="name"
+          control={form.control}
+          placeholder="Nome"
+          autoCapitalize="words"
+        />
+      </Input.Content>
+    </Input.Root>
+
+    <Input.Root>
+      <Input.Content
+        icon={<Phone size={23} strokeWidth={2.5} color={"#FFFFFF"} />}
+        errors={errors.phone!}
+      >
+        <Input.TextInputMask
+          name="phone"
+          control={form.control}
+          placeholder="Telefone"
+          type="cel-phone"
+          keyboardType="numeric"
+          maxLength={15}
+        />
+      </Input.Content>
+    </Input.Root>
+
+    <Input.Root>
+      <Input.Content
+        icon={
+          <CalendarDaysIcon strokeWidth={2.5} size={23} color={"#FFFFFF"} />
+        }
+        errors={errors?.birthDate!}
+      >
+        <Input.TextInputMask
+          name="birthDate"
+          type="custom"
+          maxLength={10}
+          options={{
+            mask: "99/99/9999",
+          }}
+          control={form.control}
+          placeholder="Data de nascimento"
+          keyboardType="numeric"
+        />
+      </Input.Content>
+    </Input.Root>
+
+    <Dropdown
+      name="gender"
+      control={form.control}
+      error={errors.gender!}
+      data={GENDERS}
+      colorsIndicator={["#4167C5", "#C54186"]}
+      placeholder="Selecione um genêro"
+      icon={<Mars strokeWidth={2.5} color={"#FFF"} size={23} />}
+    />
+
+    <Dropdown
+      name="baptized"
+      control={form.control}
+      error={errors.baptized!}
+      data={BAPTIZED_OPTIONS}
+      placeholder="Batizado no espiríto santo?"
+      icon={<Flame strokeWidth={2.5} color={"#FFF"} size={24} />}
+    />
+
+    <Input.Root>
+      <Input.Content
+        icon={<IdCard strokeWidth={2} size={28} color={"#FFFFFF"} />}
+        errors={errors?.memberCard!}
+      >
+        <Input.TextInputMask
+          name="memberCard"
+          control={form.control}
+          placeholder="Nº do cartão de membro"
+          keyboardType="numeric"
+          type="custom"
+          maxLength={9}
+          options={{
+            mask: "999999999",
+          }}
+        />
+      </Input.Content>
+    </Input.Root>
+
+    <Dropdown
+      name="suit"
+      control={form.control}
+      error={errors.suit!}
+      placeholder="Selecione um naipe"
+      data={suitData.filter(
+        (item): item is NonNullable<VoiceValue> => item !== null
+      )}
+      icon={<MicIcon strokeWidth={2.5} color={"#FFF"} size={23} />}
+    />
+  </RN.View>
+);
+
+const AddressSection: React.FC<{
+  form: any;
+  errors: any;
+}> = ({ form, errors }) => (
+  <RN.View className="gap-5">
+    <Input.Root>
+      <Input.Content
+        icon={<LocationEdit strokeWidth={2} size={28} color={"#FFFFFF"} />}
+        errors={errors?.zipCode!}
+      >
+        <Input.TextInputMask
+          control={form.control}
+          name="zipCode"
+          placeholder="CEP"
+          type="custom"
+          maxLength={9}
+          keyboardType="numeric"
+          options={{ mask: "99999-999" }}
+        />
+      </Input.Content>
+    </Input.Root>
+
+    <Input.Root>
+      <Input.Content
+        icon={<LocationEdit strokeWidth={2} size={28} color={"#FFFFFF"} />}
+        errors={errors.street!}
+      >
+        <Input.TextInput
+          name="street"
+          control={form.control}
+          placeholder="Rua"
+          autoCapitalize="words"
+        />
+      </Input.Content>
+    </Input.Root>
+
+    <Input.Root>
+      <Input.Content
+        icon={<LocationEdit strokeWidth={2} size={28} color={"#FFFFFF"} />}
+        errors={errors.neighborhood!}
+      >
+        <Input.TextInput
+          name="neighborhood"
+          control={form.control}
+          placeholder="Bairro"
+          autoCapitalize="words"
+        />
+      </Input.Content>
+    </Input.Root>
+
+    <RN.View style={{ flexDirection: "row", gap: 10 }}>
+      <Input.Content
+        style={{ flex: 0.55 }}
+        icon={<LocationEdit strokeWidth={2} size={28} color={"#FFFFFF"} />}
+        errors={errors?.number!}
+      >
+        <Input.TextInput
+          control={form.control}
+          name="number"
+          placeholder="Nº"
+          keyboardType="numeric"
+          maxLength={4}
+        />
+      </Input.Content>
+
+      <Input.Content style={{ flex: 1 }} errors={errors?.complement!}>
+        <Input.TextInput
+          control={form.control}
+          name="complement"
+          placeholder="Complemento (Opcional)"
+        />
+      </Input.Content>
+    </RN.View>
+  </RN.View>
+);
+
+// Main component
 const RegisterMemberScreen = () => {
   const { goBack } = useNavigation();
   const route = useRoute();
-  const member = route?.params?.member;
+  const member = (route.params as RouteParams)?.member;
+  const [dataToDropdownSuit, setDataToDropdownSuit] =
+    useState<VoiceValue[]>(MALE_VOICES);
   const FORM = useFormRegisterMember();
-  const VM = useRegisterMember({ isEdit: member?.id });
-
-  const handleGetAddressByZipCode = async (zipCode: string) => {
-    try {
-      const response = await axios.get(
-        `https://viacep.com.br/ws/${zipCode}/json/`
-      );
-      const { logradouro, uf, bairro, localidade } = response?.data;
-      return { logradouro, uf, bairro, localidade };
-    } catch (error) {
-      console.log("Erro ao buscar CEP");
-    }
-  };
+  const VM = useRegisterMember({ isEdit: member?.id || "" });
+  const scrollViewRef = useRef<any>(null);
 
   const watchedZipCode = FORM.watch("zipCode");
+  const watchedGender = FORM.watch("gender");
   const [debouncedZipCode] = useDebounce(watchedZipCode, 350);
 
+  // Update suit options based on gender
+  useEffect(() => {
+    const isGenderMale = watchedGender === "Masculino";
+    isGenderMale
+      ? setDataToDropdownSuit(MALE_VOICES)
+      : setDataToDropdownSuit(FEMALE_VOICES);
+  }, [watchedGender]);
+
+  // Fetch address by zip code
   useEffect(() => {
     const fetchAddress = async () => {
       if (debouncedZipCode?.length === 9) {
@@ -74,24 +349,47 @@ const RegisterMemberScreen = () => {
     fetchAddress();
   }, [debouncedZipCode]);
 
-  useEffect(() => {
-    if (!member) {
-      FORM.reset();
-      VM.setProfileImage("");
-    } else {
-      FORM.setValue("name", member?.name);
-      FORM.setValue("phone", member?.phone);
-      FORM.setValue("birthDate", member?.birthDate);
-      FORM.setValue("gender", member?.gender);
-      FORM.setValue("baptized", member?.baptized);
-      FORM.setValue("memberCard", member?.memberCard);
-      FORM.setValue("suit", member?.suit);
-      FORM.setValue("zipCode", member?.zipCode);
-      FORM.setValue("number", member?.number);
-      FORM.setValue("complement", member?.complement);
-      VM.setProfileImage(member?.profileImageUri);
-    }
-  }, [member]);
+  const handleSubmit = useCallback(
+    (data: any) => {
+      VM.onSubmit(data);
+    },
+    [VM.onSubmit]
+  );
+
+  // Reset screen state when it comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      // Reset form and state when screen comes into focus
+      if (!member) {
+        FORM.reset();
+        VM.setProfileImage("");
+      } else {
+        // If editing a member, populate the form with member data
+        FORM.setValue("name", member?.name || "");
+        FORM.setValue("phone", member?.phone || "");
+        FORM.setValue("birthDate", member?.birthDate || "");
+        FORM.setValue("gender", member?.gender || "");
+        FORM.setValue("baptized", member?.baptized || "");
+        FORM.setValue("memberCard", member?.memberCard || "");
+        FORM.setValue("suit", member?.suit || "");
+        FORM.setValue("zipCode", member?.zipCode || "");
+        FORM.setValue("number", member?.number || "");
+        FORM.setValue("complement", member?.complement || "");
+        VM.setProfileImage(member?.profileImageUri || "");
+
+        // Set suit data based on gender
+        const isGenderMale = member?.gender === "Masculino";
+        setDataToDropdownSuit(isGenderMale ? MALE_VOICES : FEMALE_VOICES);
+      }
+
+      // Scroll to top
+      setTimeout(() => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollTo?.({ y: 0, animated: true });
+        }
+      }, 100);
+    }, [member])
+  );
 
   return (
     <RN.View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -103,6 +401,7 @@ const RegisterMemberScreen = () => {
       />
 
       <KeyboardAwareScrollView
+        ref={scrollViewRef}
         contentContainerStyle={{
           flexGrow: 1,
           paddingBottom: 50,
@@ -111,240 +410,30 @@ const RegisterMemberScreen = () => {
         keyboardShouldPersistTaps="handled"
         bottomOffset={50}
       >
-        <RN.TouchableOpacity
-          className="w-36 h-36 self-center mt-10"
+        <ProfileImageSection
+          profileImage={VM.profileImage}
           onPress={VM.openImagePickerAsync}
-        >
-          <RN.View
-            style={{
-              borderRadius: 72,
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <RN.Image
-              source={
-                !VM.profileImage ? UploadProfilePhoto : { uri: VM.profileImage }
-              }
-              style={{
-                width: "100%",
-                height: "100%",
-              }}
-              resizeMode="cover"
-            />
-
-            {VM?.profileImage && (
-              <RN.View
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  width: "100%",
-                  height: 40,
-                  backgroundColor: "#ffffff42",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderBottomLeftRadius: 72,
-                  borderBottomRightRadius: 72,
-                }}
-              >
-                <Camera color={"#ffffff"} />
-              </RN.View>
-            )}
-          </RN.View>
-        </RN.TouchableOpacity>
+        />
 
         <RN.View className="gap-5 my-11">
-          <Input.Root>
-            <Input.Content
-              icon={<User size={25} strokeWidth={2.5} color={"#FFFFFF"} />}
-              errors={FORM.errors.name!}
-            >
-              <Input.TextInput
-                name="name"
-                control={FORM.control}
-                placeholder="Nome"
-                autoCapitalize="words"
-              />
-            </Input.Content>
-          </Input.Root>
-
-          <Input.Root>
-            <Input.Content
-              icon={<Phone size={23} strokeWidth={2.5} color={"#FFFFFF"} />}
-              errors={FORM.errors.phone!}
-            >
-              <Input.TextInputMask
-                name="phone"
-                control={FORM.control}
-                placeholder="Telefone"
-                type="cel-phone"
-                keyboardType="numeric"
-                maxLength={15}
-              />
-            </Input.Content>
-          </Input.Root>
-
-          <Input.Root>
-            <Input.Content
-              icon={
-                <CalendarDaysIcon
-                  strokeWidth={2.5}
-                  size={23}
-                  color={"#FFFFFF"}
-                />
-              }
-              errors={FORM.errors?.birthDate!}
-            >
-              <Input.TextInputMask
-                name="birthDate"
-                type="custom"
-                maxLength={10}
-                options={{
-                  mask: "99/99/9999",
-                }}
-                control={FORM.control}
-                placeholder="Data de nascimento"
-                keyboardType="numeric"
-              />
-            </Input.Content>
-          </Input.Root>
-
-          <Dropdown
-            name="gender"
-            control={FORM.control}
-            error={FORM.errors.gender!}
-            data={["Masculino", "Feminino"]}
-            colorsIndicator={["#4167C5", "#C54186"]}
-            placeholder="Selecione um genêro"
-            icon={<Mars strokeWidth={2.5} color={"#FFF"} size={23} />}
+          <PersonalInfoSection
+            form={FORM}
+            errors={FORM.errors}
+            suitData={dataToDropdownSuit}
           />
-
-          <Dropdown
-            name="baptized"
-            control={FORM.control}
-            error={FORM.errors.baptized!}
-            data={["Sim", "Não"]}
-            placeholder="Batizado no espiríto santo?"
-            icon={<Flame strokeWidth={2.5} color={"#FFF"} size={24} />}
-          />
-
-          <Input.Root>
-            <Input.Content
-              icon={<IdCard strokeWidth={2} size={28} color={"#FFFFFF"} />}
-              errors={FORM.errors?.memberCard!}
-            >
-              <Input.TextInputMask
-                name="memberCard"
-                control={FORM.control}
-                placeholder="Nº do cartão de membro"
-                keyboardType="numeric"
-                type="custom"
-                maxLength={9}
-                options={{
-                  mask: "999999999",
-                }}
-              />
-            </Input.Content>
-          </Input.Root>
-
-          <Dropdown
-            name="suit"
-            control={FORM.control}
-            error={FORM.errors.suit!}
-            placeholder="Selecione um naipe"
-            data={["Contralto", "1º Soprano", "2º Soprano"]}
-            icon={<MicIcon strokeWidth={2.5} color={"#FFF"} size={23} />}
-          />
-
-          <Input.Root>
-            <Input.Content
-              icon={
-                <LocationEdit strokeWidth={2} size={28} color={"#FFFFFF"} />
-              }
-              errors={FORM.errors?.zipCode!}
-            >
-              <Input.TextInputMask
-                control={FORM.control}
-                name="zipCode"
-                placeholder="CEP"
-                type="custom"
-                maxLength={9}
-                keyboardType="numeric"
-                options={{ mask: "99999-999" }}
-                onChangeText={() => {}}
-              />
-            </Input.Content>
-          </Input.Root>
-
-          <Input.Root>
-            <Input.Content
-              icon={
-                <LocationEdit strokeWidth={2} size={28} color={"#FFFFFF"} />
-              }
-              errors={FORM.errors.street!}
-            >
-              <Input.TextInput
-                name="street"
-                control={FORM.control}
-                placeholder="Rua"
-                autoCapitalize="words"
-              />
-            </Input.Content>
-          </Input.Root>
-
-          <Input.Root>
-            <Input.Content
-              icon={
-                <LocationEdit strokeWidth={2} size={28} color={"#FFFFFF"} />
-              }
-              errors={FORM.errors.neighborhood!}
-            >
-              <Input.TextInput
-                name="neighborhood"
-                control={FORM.control}
-                placeholder="Bairro"
-                autoCapitalize="words"
-              />
-            </Input.Content>
-          </Input.Root>
-
-          <RN.View style={{ flexDirection: "row", gap: 10 }}>
-            <Input.Content
-              style={{ flex: 0.55 }}
-              icon={
-                <LocationEdit strokeWidth={2} size={28} color={"#FFFFFF"} />
-              }
-              errors={FORM.errors?.number!}
-            >
-              <Input.TextInput
-                control={FORM.control}
-                name="number"
-                placeholder="Nº"
-                keyboardType="numeric"
-                maxLength={4}
-              />
-            </Input.Content>
-
-            <Input.Content
-              style={{ flex: 1 }}
-              errors={FORM.errors?.complement!}
-            >
-              <Input.TextInput
-                control={FORM.control}
-                name="complement"
-                placeholder="Complemento (Opcional)"
-              />
-            </Input.Content>
-          </RN.View>
+          <AddressSection form={FORM} errors={FORM.errors} />
         </RN.View>
 
         <Button
-          onPress={FORM.handleSubmit(VM.onSubmit)}
+          onPress={FORM.handleSubmit(handleSubmit)}
           activeLoading={VM?.isLoading}
         >
-          <Text className="font-poppinsSemiBold text-white">Cadastrar</Text>
+          <Text className="font-poppinsSemiBold text-white">
+            {member?.id ? "Editar" : "Cadastrar"}
+          </Text>
         </Button>
       </KeyboardAwareScrollView>
+
       <Toast
         message={
           member?.id
