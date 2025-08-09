@@ -1,12 +1,9 @@
-import useAnimationContent from "../hooks/animations/useAnimationContent";
-
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { colors } from "@styles/colors";
-import height from "@utils/getHeight";
 import CreateCallFormContent from "./CreateCallFormContent";
-import { CheckLogo } from "@assets/images/modal";
+
 import { useCallback } from "react";
-import { Button, Header, Modal, Text } from "@components/index";
+import { Header } from "@components/index";
 import {
   SongsList,
   MembersList,
@@ -22,7 +19,7 @@ const CreateCallScreenContent = ({ eventData }: { eventData: IEvent }) => {
   const { goBack } = useNavigation();
   const { resetAll, step, visibleToast, setVisibleToast } =
     useCreateCallContext();
-  const { animatedContentStyles } = useAnimationContent();
+  /*   const { animatedContentStyles } = useAnimationContent(); */
   useFocusEffect(useCallback(() => resetAll(), []));
 
   const renderStepContent = () => {
@@ -49,12 +46,9 @@ const CreateCallScreenContent = ({ eventData }: { eventData: IEvent }) => {
 
       <StepIndicators />
 
-      <RN.Animated.View
-        className="flex-1 mt-6 mb-11 px-6"
-        style={animatedContentStyles}
-      >
+      <RN.View className="flex-1 mt-6 mb-11 px-6">
         {renderStepContent()}
-      </RN.Animated.View>
+      </RN.View>
 
       <BottomNavigation />
 
