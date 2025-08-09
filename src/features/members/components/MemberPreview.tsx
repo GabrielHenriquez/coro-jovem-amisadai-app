@@ -8,19 +8,28 @@ import { IMember } from "../domain/entities/Member";
 import { calcularIdade } from "../utils/calculateAge";
 import { useNavigation } from "@react-navigation/native";
 import { useBottomSheet } from "@gorhom/bottom-sheet";
+import { getInitials } from "@utils/strings";
+import ProfileImage from "@components/ProfileImage";
 
-const MemberDetailItem = ({
-  label,
-  value,
-}: {
+// Types
+interface MemberDetailItemProps {
   label: string;
   value: string | number;
+}
+
+interface MemberPreviewProps {
+  memberPressed: IMember;
+  handleDeleteMember: (member: IMember) => void;
+}
+
+const MemberDetailItem: React.FC<MemberDetailItemProps> = ({
+  label,
+  value,
 }) => (
-  <RN.View className={`flex-row gap-2 justify-center`}>
+  <RN.View className="flex-row gap-2 justify-center">
     <Component.Text className="font-poppinsSemiBold text-black">
       {label}:
     </Component.Text>
-
     <Component.Text
       className="font-poppins text-grayDark"
       style={{
@@ -33,110 +42,122 @@ const MemberDetailItem = ({
   </RN.View>
 );
 
-const MemberPreview = ({
-  memberPressed,
-  handleDeleteMember,
-}: {
-  memberPressed: IMember;
-  handleDeleteMember: (member: IMember) => void;
-}) => {
-  const { navigate } = useNavigation<any>();
-  const { close } = useBottomSheet();
+const MemberHeader: React.FC<{ member: IMember }> = ({ member }) => (
+  <RN.View className="gap-2 mt-4 items-center">
+    <Component.Text size={20} className="font-poppinsMedium leading-none">
+      {member?.name}
+    </Component.Text>
 
+    <RN.View className="flex-row gap-2 items-center">
+      <Mic2 color={colors.gray} size={20} />
+      <Component.Text
+        size={18}
+        className="font-poppinsMedium text-gray leading-none"
+      >
+        {member?.suit} • {calcularIdade(member?.birthDate)} anos
+      </Component.Text>
+    </RN.View>
+  </RN.View>
+);
+
+const MemberDetails: React.FC<{ member: IMember }> = ({ member }) => {
   const memberDetails = [
-    { label: "Data de nascimento", value: memberPressed?.birthDate },
-    { label: "Nº Cartão de membro", value: memberPressed?.memberCard },
-    { label: "Batizado no espírito santo", value: memberPressed?.baptized },
+    { label: "Data de nascimento", value: member?.birthDate },
+    { label: "Nº Cartão de membro", value: member?.memberCard },
+    { label: "Batizado no espírito santo", value: member?.baptized },
     {
       label: "Endereço",
-      value: `${memberPressed?.street}, ${memberPressed?.number}`,
+      value: `${member?.street}, ${member?.number}`,
     },
   ];
 
   return (
+    <RN.View className="gap-2.5 mt-5 w-full">
+      {memberDetails.map((detail, index) => (
+        <MemberDetailItem
+          key={index}
+          label={detail.label}
+          value={detail.value!}
+        />
+      ))}
+    </RN.View>
+  );
+};
+
+const ActionButtons: React.FC<{
+  member: IMember;
+  onEdit: () => void;
+  onDelete: () => void;
+}> = ({ member, onEdit, onDelete }) => (
+  <RN.View className="w-full gap-3">
+    <Component.Button
+      styleRest={{ height: getHeight * 0.054 }}
+      onPress={onEdit}
+    >
+      <Pen color={colors.white} size={18} />
+      <Component.Text size={15} className="font-poppinsSemiBold text-white">
+        Editar Componente
+      </Component.Text>
+    </Component.Button>
+
+    <Component.Button
+      bgColor="white"
+      styleRest={{
+        borderWidth: 1.5,
+        borderColor: colors.redDark,
+        height: getHeight * 0.054,
+      }}
+      onPress={onDelete}
+    >
+      <Trash2 color={colors.redDark} size={18} />
+      <Component.Text size={15} className="font-poppinsSemiBold text-redDark">
+        Excluir Componente
+      </Component.Text>
+    </Component.Button>
+  </RN.View>
+);
+
+// Main component
+const MemberPreview: React.FC<MemberPreviewProps> = ({
+  memberPressed,
+  handleDeleteMember,
+}) => {
+  const { navigate } = useNavigation<any>();
+  const { close } = useBottomSheet();
+
+  const handleEdit = () => {
+    close();
+    setTimeout(() => {
+      navigate("MembersNavigation", {
+        screen: "RegisterMember",
+        params: {
+          member: memberPressed,
+        },
+      });
+    }, 500);
+  };
+
+  const handleDelete = () => {
+    handleDeleteMember(memberPressed);
+  };
+
+  return (
     <RN.View className="items-center px-10">
-      <RN.Image
-        source={{
+      <ProfileImage
+        data={{
+          name: memberPressed?.name,
           uri: memberPressed?.profileImageUri,
         }}
-        style={{
-          width: 94,
-          height: 94,
-          borderRadius: 45,
-          borderWidth: 1.5,
-          borderColor: colors.gray,
-        }}
+        size={94}
       />
-
-      <RN.View className="gap-2 mt-4 items-center">
-        <Component.Text size={20} className="font-poppinsMedium leading-none">
-          {memberPressed?.name}
-        </Component.Text>
-
-        <RN.View className="flex-row gap-2 items-center">
-          <Mic2 color={colors.gray} size={20} />
-          <Component.Text
-            size={18}
-            className="font-poppinsMedium text-gray leading-none"
-          >
-            {memberPressed?.suit} • {calcularIdade(memberPressed?.birthDate)}{" "}
-            anos
-          </Component.Text>
-        </RN.View>
-      </RN.View>
-
-      <RN.View className="gap-2.5 mt-5 w-full">
-        {memberDetails.map((detail, index) => (
-          <MemberDetailItem
-            key={index}
-            label={detail.label}
-            value={detail.value!}
-            className={detail.className}
-          />
-        ))}
-      </RN.View>
-
+      <MemberHeader member={memberPressed} />
+      <MemberDetails member={memberPressed} />
       <Component.Spacer height={25} />
-
-      <RN.View className="w-full gap-3">
-        <Component.Button
-          styleRest={{ height: getHeight * 0.054 }}
-          onPress={() => {
-            close();
-            setTimeout(() => {
-              navigate("MembersNavigation", {
-                screen: "RegisterMember",
-                params: {
-                  member: memberPressed,
-                },
-              });
-            }, 500);
-          }}
-        >
-          <Pen color={colors.white} size={18} />
-          <Component.Text size={15} className="font-poppinsSemiBold text-white">
-            Editar Componente
-          </Component.Text>
-        </Component.Button>
-
-        <Component.Button
-          bgColor="white"
-          styleRest={{
-            borderWidth: 1.5,
-            borderColor: colors.redDark,
-            height: getHeight * 0.054,
-          }}
-          onPress={() => handleDeleteMember(memberPressed)}
-        >
-          <Trash2 color={colors.redDark} size={18} />
-          <Component.Text
-            size={15}
-            className="font-poppinsSemiBold text-redDark"
-          >
-            Excluir Componente
-          </Component.Text>
-        </Component.Button>
-      </RN.View>
+      <ActionButtons
+        member={memberPressed}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </RN.View>
   );
 };
