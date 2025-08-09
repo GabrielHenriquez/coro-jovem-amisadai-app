@@ -4,6 +4,7 @@ import { Mic2 } from "lucide-react-native";
 import { colors } from "@styles/colors";
 import { IMember } from "../domain/entities/Member";
 import { calcularIdade } from "../utils/calculateAge";
+import ProfileImage from "@components/ProfileImage";
 
 const MemberCard = ({
   onPress,
@@ -35,20 +36,9 @@ const MemberCard = ({
       />
 
       <RN.View className="gap-3.5 flex-row items-center">
-        <RN.Image
-          source={{
-            uri: member?.profileImageUri
-              ? member.profileImageUri
-              : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-          }}
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: 30,
-            borderWidth: 1,
-            borderColor: colors.gray,
-          }}
-          resizeMode="cover"
+        <ProfileImage
+          data={{ name: member?.name, uri: member?.profileImageUri }}
+          size={52}
         />
 
         <RN.View className="gap-1">

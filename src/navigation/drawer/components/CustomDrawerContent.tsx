@@ -6,6 +6,7 @@ import { LogOut } from "lucide-react-native";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { useAuthStore } from "@features/auth/presentation/stores/authStore";
 import * as RN from "react-native";
+import ProfileImage from "@components/ProfileImage";
 
 export default function CustomDrawerContent(
   props: DrawerContentComponentProps
@@ -24,20 +25,7 @@ export default function CustomDrawerContent(
     >
       <RN.View className="px-4 mt-8">
         <RN.View className="items-center gap-4">
-          <RN.View
-            style={{
-              height: 84,
-              width: 84,
-              borderRadius: 42,
-              backgroundColor: colors.primary,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text size={30} className="font-poppinsSemiBold text-white">
-              GH
-            </Text>
-          </RN.View>
+          <ProfileImage data={{ name: user?.name!, uri: "" }} size={84} />
 
           <RN.View className="gap-1 items-center">
             <Text size={18} className="font-poppinsSemiBold">
