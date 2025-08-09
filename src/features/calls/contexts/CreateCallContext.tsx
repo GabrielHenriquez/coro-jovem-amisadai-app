@@ -56,7 +56,7 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
 
   const getSongs = async () => {
     try {
-      const snapshot = await getDocs(collection(db, DB_COLLECTIONS?.musics));
+      const snapshot = await getDocs(collection(db, "musics"));
       return snapshot.docs
         .map((doc) => doc.data()?.music)
         .filter(Boolean)
@@ -144,6 +144,8 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
   const handleCreateEvent = () => {
     const { dataFormEvent, dataFormEventCard } = handleGetEventData();
     const eventId = `${dataFormEvent?.date}-${eventID}`;
+
+    console.log(eventId);
 
     mutate(
       { eventId, dataFormEvent, dataFormEventCard, isEdit: !!eventID },
