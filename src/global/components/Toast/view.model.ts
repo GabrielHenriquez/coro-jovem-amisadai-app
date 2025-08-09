@@ -16,11 +16,11 @@ const useToastViewModel = ({ visible, onHide }: IToastViewModel) => {
   }));
 
   function applyAnimation() {
-    if (visible) translateY.value = 0;
+    if (visible) translateY.value = -5;
     setTimeout(() => {
       onHide();
       translateY.value = -100;
-    }, 3250);
+    }, 2500);
   }
 
   useEffect(() => {

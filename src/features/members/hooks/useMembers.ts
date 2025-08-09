@@ -4,14 +4,14 @@ import { MembersUseCase } from "../domain/usecases/MembersUseCase";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IMember } from "../domain/entities/Member";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useMemberStore } from "../stores/membersStore";
 
 const membersRepo = new FirebaseMembersRepository();
 const membersUseCase = new MembersUseCase(membersRepo);
 
 const useMembers = () => {
   const [memberSelected, setMemberSelected] = useState<IMember | null>(null);
-  const [visibleToast, setVisibleToast] = useState(false);
-
+  const { setVisibleToast } = useMemberStore();
   const queryClient = useQueryClient();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handlePresentModalPress = useCallback(() => {
@@ -44,7 +44,7 @@ const useMembers = () => {
     queryClient.invalidateQueries({
       queryKey: ["members"],
     });
-    setVisibleToast(true);
+    setVisibleToast(true, "delete");
   };
 
   useEffect(() => {
@@ -52,8 +52,6 @@ const useMembers = () => {
   }, [memberSelected]);
 
   return {
-    visibleToast,
-    setVisibleToast,
     handleDeleteMember,
     bottomSheetModalRef,
     data: queryGetMembers.data,

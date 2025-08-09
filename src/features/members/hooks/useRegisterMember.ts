@@ -7,12 +7,13 @@ import { storage } from "global/configs/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
+import { useMemberStore } from "../stores/membersStore";
 
 const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
   const repository = new FirebaseMembersRepository();
   const queryClient = useQueryClient();
   const [profileImage, setProfileImage] = useState("");
-  const [visibleToast, setVisibleToast] = useState(false);
+  const { setVisibleToast } = useMemberStore();
   const { goBack } = useNavigation();
 
   const openImagePickerAsync = async () => {
@@ -55,7 +56,7 @@ const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
         : repository.createMember({ ...data, profileImageUri: uri });
     },
     onSuccess: () => {
-      setVisibleToast(true);
+      const action = isEdit ? "edit" : "create";
       queryClient.invalidateQueries({
         queryKey: ["members"],
       });
@@ -64,23 +65,36 @@ const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
           ? "✅ Membro editado com sucesso!"
           : "✅ Membro criado com sucesso!"
       );
-      setTimeout(() => {
-        goBack();
-      }, 2500);
+      goBack();
+      setVisibleToast(true, action);
     },
     onError: (erro) => console.error("[MutationRegister] ->", erro),
   });
 
   const onSubmit = (dataForm: FormDataRegisterMember) => {
     Keyboard.dismiss();
-    createMemberMutation.mutate(dataForm);
+    const dataForm2 = {
+      name: "teste",
+      memberCard: "1234567890",
+      birthDate: "1990-01-01",
+      gender: "Masculino",
+      baptized: "Sim",
+      suit: "Sim",
+      uf: "SP",
+      city: "São Paulo",
+      street: "Rua Teste",
+      number: "123",
+      neighborhood: "Bairro Teste",
+      zipCode: "1234567890",
+      phone: "1234567890",
+      complement: "Complemento Teste",
+    };
+    createMemberMutation.mutate(dataForm2);
   };
 
   return {
     onSubmit,
-    visibleToast,
     setProfileImage,
-    setVisibleToast,
     openImagePickerAsync,
     profileImage,
     isLoading: createMemberMutation?.isPending,
