@@ -68,6 +68,7 @@ export default {
       MESSAGING_SENDER_ID: process.env.MESSAGING_SENDER_ID,
       PROJECT_ID: process.env.PROJECT_ID,
       STORAGE_BUCKET: process.env.STORAGE_BUCKET,
+      ENV: process.env.ENV,
     },
     owner: "gabrielrick2941",
   },
