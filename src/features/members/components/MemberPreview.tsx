@@ -34,7 +34,7 @@ const MemberDetailItem: React.FC<MemberDetailItemProps> = ({
       className="font-poppins text-grayDark"
       style={{
         flexWrap: "wrap",
-        maxWidth: "50%",
+        maxWidth: "65%",
       }}
     >
       {value}

@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   contentInput: {
     backgroundColor: "#FFFFFF",
     width: "100%",
-    height: responsiveSize(46),
+    height: responsiveSize(42),
     alignItems: "center",
     flexDirection: "row",
     borderRadius: 8,
