@@ -30,7 +30,7 @@ const ProfileImage: React.FC<{
     >
       <Text
         className="font-poppinsSemiBold text-primary"
-        size={size > 52 ? 34 : 24}
+        size={size > 52 ? 34 : 20}
       >
         {getInitials(data?.name || "")}
       </Text>

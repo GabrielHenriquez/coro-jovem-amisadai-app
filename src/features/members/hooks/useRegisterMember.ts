@@ -73,23 +73,7 @@ const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
 
   const onSubmit = (dataForm: FormDataRegisterMember) => {
     Keyboard.dismiss();
-    const dataForm2 = {
-      name: "teste",
-      memberCard: "1234567890",
-      birthDate: "1990-01-01",
-      gender: "Masculino",
-      baptized: "Sim",
-      suit: "Sim",
-      uf: "SP",
-      city: "São Paulo",
-      street: "Rua Teste",
-      number: "123",
-      neighborhood: "Bairro Teste",
-      zipCode: "1234567890",
-      phone: "1234567890",
-      complement: "Complemento Teste",
-    };
-    createMemberMutation.mutate(dataForm2);
+    createMemberMutation.mutate(dataForm);
   };
 
   return {

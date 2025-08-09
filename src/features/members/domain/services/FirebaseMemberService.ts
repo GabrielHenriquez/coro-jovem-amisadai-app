@@ -34,7 +34,6 @@ export const FirebaseMemberService = {
     memberCard: string;
     profileImageUri: string;
   }): Promise<void> => {
-    console.log(member);
     const docRef = doc(db, DB_COLLECTIONS.components, member?.id);
     const imageRef = ref(
       storage,

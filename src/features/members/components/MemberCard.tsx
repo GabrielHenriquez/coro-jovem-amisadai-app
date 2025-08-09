@@ -38,7 +38,7 @@ const MemberCard = ({
       <RN.View className="gap-3.5 flex-row items-center">
         <ProfileImage
           data={{ name: member?.name, uri: member?.profileImageUri }}
-          size={52}
+          size={50}
         />
 
         <RN.View className="gap-1">
