@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useEventsQueries } from "../infra/queryAdapters/useEventsQueries";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { IEvent } from "../domain/entities/Events";
@@ -6,13 +6,12 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export const useCalls = () => {
   const formatoAmericano = new Date().toISOString().split("T")[0];
-  const [currentDateSelected, setCurrentDateSelected] = useState<string | null>(
-    formatoAmericano
-  );
   const queryClient = useQueryClient();
   const [opennedCalendar, setOpennedCalendar] = useState(false);
   const [showToastDelete, setShowToastDelete] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>("");
+  const [selectedDate, setSelectedDate] = useState<string | null>(
+    formatoAmericano
+  );
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const callPreviewModalRef = useRef<BottomSheetModal>(null);
   const {
@@ -67,7 +66,6 @@ export const useCalls = () => {
   const getEventsByDateToCard = (date: string) => {
     if (opennedCalendar) setOpennedCalendar(false);
     setSelectedDate(date);
-    setCurrentDateSelected(date);
   };
 
   const handleDeleteEvent = (event: IEvent) => {
@@ -92,7 +90,7 @@ export const useCalls = () => {
     callPreviewModalRef,
     loadingEvent: getEventByIdMutation?.isPending,
     event: getEventByIdMutation?.data,
-    currentDateSelected,
+    selectedDate,
     validate,
     opennedCalendar,
     setOpennedCalendar,
