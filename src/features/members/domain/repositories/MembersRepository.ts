@@ -1,8 +1,9 @@
 import { IMember } from "../entities/Member";
+import { FormDataRegisterMember } from "@features/members/hooks/forms/useFormRegisterMember";
 
 export interface MembersRepository {
-  createMember(): Promise<void>;
-  updateMember(): Promise<void>;
+  createMember(memberData: FormDataRegisterMember): Promise<void>;
+  updateMember(memberData: FormDataRegisterMember): Promise<void>;
   getMembers(): Promise<IMember[]>;
   getMember(id: string): Promise<IMember>;
   deleteMember(member: {
