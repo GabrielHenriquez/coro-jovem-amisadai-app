@@ -28,13 +28,13 @@ export const useEventsQueries = () => {
 
   const createEventMutation = useMutation({
     mutationFn: async ({
-      isEdit,
       eventId,
+      oldKey,
       dataFormEvent,
       dataFormEventCard,
     }: {
-      isEdit: boolean;
       eventId: string;
+      oldKey?: string;
       dataFormEvent: IEvent;
       dataFormEventCard: IEventCard;
     }) => {
@@ -43,18 +43,12 @@ export const useEventsQueries = () => {
         dataFormEvent?.type === "Saída" ? colors.redEvent : colors.blueEvent;
 
       await Promise.all([
-        repository.createEvent({
-          eventId,
-          data: dataFormEvent,
-        }),
-        repository.createEventCard({
-          eventId,
-          data: dataFormEventCard,
-        }),
-
+        repository.createEvent({ eventId, data: dataFormEvent }),
+        repository.createEventCard({ eventId, data: dataFormEventCard }),
         repository.createDotToEventInDB({
           date: dataFormEvent?.date,
           key,
+          oldKey,
           color,
         }),
       ]);
