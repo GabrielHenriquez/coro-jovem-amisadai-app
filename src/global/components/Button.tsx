@@ -7,11 +7,13 @@ import { getHeight } from "@utils/index";
 interface ButtonProps extends RN.TouchableOpacityProps {
   bgColor?: IColors;
   activeLoading?: boolean;
+  activeLoadingColor?: IColors;
   styleRest?: RN.ViewStyle;
 }
 
 const Button = ({
   activeLoading,
+  activeLoadingColor = "white",
   children,
   bgColor = "primary",
   styleRest,
@@ -31,7 +33,7 @@ const Button = ({
       {...rest}
     >
       {activeLoading ? (
-        <ActivityIndicator size={25} color="#FFFFFF" />
+        <ActivityIndicator size={26} color={colors[activeLoadingColor]} />
       ) : (
         <View className="flex-row items-center space-x-2 gap-2.5">
           {children}
