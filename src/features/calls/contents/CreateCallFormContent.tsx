@@ -16,6 +16,7 @@ import { IEvent } from "../domain/entities/Events";
 import { formatDateToBR } from "./../../members/utils/formatDate";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCreateCallContext } from "../contexts/CreateCallContext";
+import { IMember } from "@features/members/domain/entities/Member";
 
 export type CallValue = "Local" | "Saída";
 
@@ -23,7 +24,7 @@ const CreateCallFormContent = ({ eventData }: { eventData: IEvent }) => {
   const formValidator = useFormContext();
   const { errors } = formValidator.formState;
   const { watch, setValue } = formValidator;
-  const { setMembersSelected, setSongsSelected, setEventID } =
+  const { setMembersSelected, setSongsData, setEventID, setOldType } =
     useCreateCallContext();
   const callType = watch("callType");
 
@@ -36,9 +37,10 @@ const CreateCallFormContent = ({ eventData }: { eventData: IEvent }) => {
           setValue("date", formatDateToBR(eventData?.date));
           setValue("namePreacher", eventData?.namePreacher);
           setValue("callType", eventData?.type);
-          setMembersSelected(eventData?.components);
-          setSongsSelected(eventData?.musics);
-          setEventID(eventData?.numberSearchDoc);
+          setMembersSelected(eventData?.components as IMember[]);
+          setSongsData(eventData?.musics);
+          setEventID(eventData?.numberSearchDoc.toString());
+          setOldType(eventData?.type);
         }, 350);
       }
     }, [eventData])
