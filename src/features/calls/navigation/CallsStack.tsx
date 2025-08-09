@@ -3,9 +3,10 @@ import {
   NativeStackNavigationProp,
 } from "@react-navigation/native-stack";
 import CreateCallSPAScreen from "../screens/CreateCallSPAScreen";
+import { IEvent } from "../domain/entities/Events";
 
 export type CallStackParamList = {
-  CreateCall: undefined;
+  CreateCall: { event?: IEvent } | undefined;
 };
 
 export type CallNavigationProp = NativeStackNavigationProp<CallStackParamList>;
