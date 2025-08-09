@@ -1,5 +1,6 @@
 export const formatDateToBR = (date: string) => {
-  const newDate = new Date(date);
-  const formatted = newDate.toLocaleDateString("pt-BR");
+  if (!date) return "";
+  const [ano, mes, dia] = date?.split("-");
+  const formatted = `${dia}/${mes}/${ano}`;
   return formatted;
 };

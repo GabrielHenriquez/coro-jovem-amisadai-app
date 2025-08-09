@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { htmlContent, ptBR } from "../utils/index";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,23 +16,36 @@ import getHeight from "@utils/getHeight";
 import Pdf from "react-native-pdf";
 import * as RN from "react-native";
 import * as RNC from "react-native-calendars";
+import { DateData, DayState } from "react-native-calendars/src/types";
 import * as Print from "expo-print";
 import * as Share from "expo-sharing";
 import { useCalls } from "../hooks/useCalls";
 import { EmptyCall } from "@assets/images";
 import Toast from "@components/Toast/view";
 import { useNavigation } from "@react-navigation/native";
-import { useBottomSheet } from "@gorhom/bottom-sheet";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { DrawerParamList } from "@navigation/drawer/DrawerNavigator";
+import { formatDateToBR } from "@features/members/utils/formatDate";
+import CalendarDay from "../components/CalendarDay";
+
+// Configure calendar locale
 RNC.LocaleConfig.locales["pt-br"] = ptBR;
 RNC.LocaleConfig.defaultLocale = "pt-br";
 
+// Type definitions
+interface CalendarMonth {
+  month: number;
+  year: number;
+}
+
 export default function CallScreen() {
-  const [day, setDay] = useState<RNC.DateData>();
+  const [day, setDay] = useState<DateData | undefined>();
   const [currentMonthFormatted, setCurrentMonthFormatted] = useState("");
 
-  const { navigate } = useNavigation();
+  const { navigate } = useNavigation<DrawerNavigationProp<DrawerParamList>>();
   const [pdfUri, setPdfUri] = useState<string | null>(null);
   const [loadingEventPreview, setLoadingEventPreview] = useState(false);
+
   const {
     eventsBirthDate,
     showToastDelete,
@@ -47,44 +60,84 @@ export default function CallScreen() {
     bottomSheetModalRef,
     callPreviewModalRef,
     validate,
-    currentDateSelected,
     handleDeleteEvent,
     isLoadingDelete,
     handleGetEvent,
+    selectedDate,
   } = useCalls();
-  const calendarHeight = opennedCalendar ? 355 : 150;
 
-  const currentMonth = new Date()
-    .toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
-    .replace(" de ", " ")
-    .replace(/^./, (letra) => letra.toUpperCase());
+  const calendarHeight = useMemo(
+    () => (opennedCalendar ? 355 : 150),
+    [opennedCalendar]
+  );
 
-  const formatDateToBR = (date: string) => {
-    const newDate = new Date(date);
-    const formatted = newDate.toLocaleDateString("pt-BR");
-    return formatted;
-  };
+  // Memoized current month calculation
+  const currentMonth = useMemo(() => {
+    return new Date()
+      .toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+      .replace(" de ", " ")
+      .replace(/^./, (letra) => letra.toUpperCase());
+  }, []);
 
-  const generatePDF = async () => {
+  // Memoized PDF generation function
+  const generatePDF = useCallback(async () => {
+    if (!event) return;
+
     setLoadingEventPreview(true);
-    const { uri } = await Print.printToFileAsync({ html: htmlContent(event) });
-    setPdfUri(uri);
-    setTimeout(() => setLoadingEventPreview(false), 300);
-  };
+    try {
+      const { uri } = await Print.printToFileAsync({
+        html: htmlContent(event),
+      });
+      setPdfUri(uri);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      setTimeout(() => setLoadingEventPreview(false), 300);
+    }
+  }, [event]);
 
+  // Memoized PDF validation effect
   useEffect(() => {
-    if (pdfUri) validate();
+    if (pdfUri) {
+      validate();
+    }
+  }, [pdfUri, validate]);
+
+  // Memoized share PDF function
+  const sharePDF = useCallback(async () => {
+    if (!pdfUri) return;
+
+    try {
+      await Share.shareAsync(pdfUri);
+    } catch (error) {
+      console.error("Error sharing PDF:", error);
+    }
   }, [pdfUri]);
 
-  const sharePDF = async () => {
-    await Share.shareAsync(pdfUri!);
-  };
+  // Memoized date formatting function
+  const formatDateDisplay = useCallback((dateString: string | null): string => {
+    if (!dateString) {
+      return new Date()
+        .toLocaleDateString("pt-BR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        })
+        .replace("-feira", "");
+    }
 
-  const capitalize = (text: string) =>
-    text.charAt(0).toUpperCase() + text.slice(1);
+    const dateParts = dateString.split("-");
+    if (dateParts.length !== 3) {
+      return new Date()
+        .toLocaleDateString("pt-BR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        })
+        .replace("-feira", "");
+    }
 
-  const testData = () => {
-    const [ano, mes, dia] = currentDateSelected?.split("-").map(Number);
+    const [ano, mes, dia] = dateParts.map(Number);
     const data = new Date(ano, mes - 1, dia);
 
     const formatador = new Intl.DateTimeFormat("pt-BR", {
@@ -93,28 +146,49 @@ export default function CallScreen() {
       month: "long",
     });
 
-    let resultado = formatador?.format(data);
+    let resultado = formatador.format(data);
     resultado = resultado.charAt(0).toUpperCase() + resultado.slice(1);
     resultado = resultado.replace("-feira", "");
 
     return resultado;
-  };
+  }, []);
 
-  const calendarHeader = (
-    <RN.View style={styles.calendarHeader}>
-      <Feather size={24} color="#E8E8E8" name="calendar" />
-      <RN.Text style={styles.calendarHeaderText}>
-        {currentMonthFormatted ? currentMonthFormatted : currentMonth}
-      </RN.Text>
-    </RN.View>
+  // Memoized calendar header
+  const calendarHeader = useMemo(
+    () => (
+      <RN.View style={styles.calendarHeader}>
+        <Feather size={24} color="#E8E8E8" name="calendar" />
+        <RN.Text style={styles.calendarHeaderText}>
+          {currentMonthFormatted || currentMonth}
+        </RN.Text>
+      </RN.View>
+    ),
+    [currentMonthFormatted, currentMonth]
   );
 
-  const sharedCalendarProps = {
-    renderArrow: (direction: "right" | "left") => (
-      <Feather size={32} color="#E8E8E8" name={`chevron-${direction}`} />
-    ),
-    headerStyle: styles.headerStyle,
-    theme: {
+  // Memoized month-year formatter
+  const monthYearFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat("pt-BR", {
+        month: "long",
+        year: "numeric",
+      }),
+    []
+  );
+
+  // Memoized month formatting function
+  const formatMonthYear = useCallback(
+    ({ month, year }: CalendarMonth): string => {
+      const raw = monthYearFormatter.format(new Date(year, month - 1));
+      const cleaned = raw.replace(" de ", " ");
+      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    },
+    [monthYearFormatter]
+  );
+
+  // Memoized calendar theme
+  const calendarTheme = useMemo(
+    () => ({
       textMonthFontSize: 22,
       textMonthFontFamily: "Rubik_500Medium",
       textDayFontFamily: "Rubik_400Regular",
@@ -130,19 +204,80 @@ export default function CallScreen() {
         height: 8,
         borderRadius: 50,
       },
+    }),
+    []
+  );
+
+  // Memoized shared calendar props
+  const sharedCalendarProps = useMemo(
+    () => ({
+      renderArrow: (direction: "right" | "left") => (
+        <Feather size={32} color="#E8E8E8" name={`chevron-${direction}`} />
+      ),
+      headerStyle: styles.headerStyle,
+      theme: calendarTheme,
+      customHeaderTitle: calendarHeader,
+      markedDates: day ? { [day.dateString]: { selected: true } } : undefined,
+      dayComponent: (props: {
+        date?: DateData;
+        state?: DayState;
+        marking?: any;
+      }) => (
+        <CalendarDay
+          {...props}
+          isExpanded={opennedCalendar}
+          date={props.date!}
+          state={props.state!}
+          day={day!}
+          setDay={setDay}
+          test={getEventsByDateToCard}
+        />
+      ),
+    }),
+    [day, calendarTheme, calendarHeader, getEventsByDateToCard]
+  );
+
+  // Memoized month change handler
+  const handleMonthChange = useCallback(
+    (month: CalendarMonth) => {
+      setCurrentMonthFormatted(formatMonthYear(month));
     },
-    customHeaderTitle: calendarHeader,
-    markedDates: day ? { [day.dateString]: { selected: true } } : undefined,
-    /*     dayComponent: (props: { date?: RNC.DateData; state?: DayState }) => (
-      <CalendarDay
-        date={props?.date!}
-        state={props?.state!}
-        day={day!}
-        setDay={setDay}
-        test={getEventsByDateToCard}
-      />
-    ), */
-  };
+    [formatMonthYear]
+  );
+
+  // Memoized day press handler
+  const handleDayPress = useCallback(
+    (dateString: string) => {
+      getEventsByDateToCard(dateString);
+    },
+    [getEventsByDateToCard]
+  );
+
+  // Memoized edit call handler
+  const handleEditCall = useCallback(() => {
+    handleModalAction(bottomSheetModalRef, "close");
+    setTimeout(() => {
+      if (event) {
+        navigate("CallsNavigation", {
+          screen: "CreateCall",
+          params: { event },
+        });
+      }
+    }, 400);
+  }, [handleModalAction, bottomSheetModalRef, event, navigate]);
+
+  // Memoized delete call handler
+  const handleDeleteCall = useCallback(() => {
+    if (event) {
+      handleDeleteEvent(event);
+    }
+  }, [event, handleDeleteEvent]);
+
+  // Memoized current date display
+  const currentDateDisplay = useMemo(
+    () => formatDateDisplay(selectedDate),
+    [selectedDate, formatDateDisplay]
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -159,19 +294,7 @@ export default function CallScreen() {
             },
           ]}
         >
-          <RNC.CalendarProvider
-            date={currentDateSelected}
-            onMonthChange={(month) => {
-              const date = new Date(month.year, month.month - 1);
-              const raw = new Intl.DateTimeFormat("pt-BR", {
-                month: "long",
-                year: "numeric",
-              }).format(date);
-
-              const formatted = capitalize(raw.replace(" de ", " ")); // "Dezembro 2025"
-              setCurrentMonthFormatted(formatted);
-            }}
-          >
+          <RNC.CalendarProvider date={selectedDate!}>
             <RN.View style={styles.calendarWrapper}>
               {/* ExpandableCalendar */}
               <RN.View
@@ -188,9 +311,12 @@ export default function CallScreen() {
                   {...sharedCalendarProps}
                   onCalendarToggled={toggleCalendar}
                   onDayPress={(day) => {
-                    getEventsByDateToCard(day?.dateString);
+                    if (day?.dateString) {
+                      handleDayPress(day.dateString);
+                    }
                   }}
                   disablePan
+                  onMonthChange={handleMonthChange}
                   markingType="multi-dot"
                   markedDates={dots}
                   disableWeekScroll
@@ -210,18 +336,17 @@ export default function CallScreen() {
                     opacity: opennedCalendar ? 1 : 0,
                     zIndex: opennedCalendar ? 2 : 0,
                     pointerEvents: opennedCalendar ? "auto" : "none",
+                    paddingHorizontal: 10,
                   },
                 ]}
               >
                 <RNC.Calendar
                   {...sharedCalendarProps}
-                  onDayPress={({ dateString }) => {
-                    getEventsByDateToCard(dateString);
-                  }}
-                  hideExtraDays
+                  onDayPress={({ dateString }) => handleDayPress(dateString)}
+                  onMonthChange={handleMonthChange}
                   markingType="multi-dot"
                   markedDates={dots}
-                  style={styles.calendar}
+                  hideExtraDays={true}
                 />
               </RN.View>
             </RN.View>
@@ -245,7 +370,7 @@ export default function CallScreen() {
       >
         {events?.length > 0 && (
           <Text size={20} className="font-poppinsSemiBold text-black">
-            {testData()}
+            {currentDateDisplay}
           </Text>
         )}
 
@@ -262,7 +387,7 @@ export default function CallScreen() {
             ) : (
               <RN.View className="items-center px-10">
                 <RN.Image
-                  source={EmptyCall}
+                  source={EmptyCall as RN.ImageSourcePropType}
                   style={{
                     width: 70,
                     height: 70,
@@ -270,7 +395,7 @@ export default function CallScreen() {
                   resizeMode="contain"
                 />
                 <Text className="font-poppinsSemiBold text-center text-black">
-                  Nenhuma chamada registrada na {testData()}.
+                  Nenhuma chamada registrada na {currentDateDisplay}.
                 </Text>
               </RN.View>
             )}
@@ -320,20 +445,20 @@ export default function CallScreen() {
               Chamada - CJA ({formatDateToBR(event?.date!)})
             </Text>
 
-            <RN.View
-              style={{ gap: 8, flexDirection: "row", alignItems: "center" }}
+            <Text
+              size={16}
+              className="font-poppinsMedium text-grayDark text-center items-center"
             >
-              <Feather size={18} name="book-open" color={colors.black} />
-              <Text size={18} className="font-poppinsMedium text-grayDark">
-                Culto: {event?.cult}
-              </Text>
-            </RN.View>
+              <Feather size={16} name="book-open" color={colors.black} />
+              {"  "}
+              Culto: {event?.cult}
+            </Text>
 
             <RN.View
               style={{ gap: 8, flexDirection: "row", alignItems: "center" }}
             >
-              <Clock size={18} color={colors.black} />
-              <Text size={18} className="font-poppinsMedium  text-grayDark">
+              <Clock size={16} color={colors.black} />
+              <Text size={16} className="font-poppinsMedium  text-grayDark">
                 Horário: {event?.hour}
               </Text>
             </RN.View>
@@ -343,9 +468,7 @@ export default function CallScreen() {
             <Button
               styleRest={{ height: getHeight * 0.05 }}
               activeLoading={loadingEventPreview}
-              onPress={() => {
-                generatePDF();
-              }}
+              onPress={generatePDF}
             >
               <MaterialIcons
                 name="picture-as-pdf"
@@ -359,17 +482,7 @@ export default function CallScreen() {
 
             <Button
               bgColor="background"
-              onPress={() => {
-                handleModalAction(bottomSheetModalRef, "close");
-                setTimeout(() => {
-                  navigate("CallsNavigation", {
-                    screen: "CreateCall",
-                    params: {
-                      event,
-                    },
-                  });
-                }, 400);
-              }}
+              onPress={handleEditCall}
               styleRest={{
                 height: getHeight * 0.05,
               }}
@@ -388,7 +501,7 @@ export default function CallScreen() {
                 height: getHeight * 0.05,
               }}
               activeLoading={isLoadingDelete}
-              onPress={() => handleDeleteEvent(event)}
+              onPress={handleDeleteCall}
             >
               <Trash2 strokeWidth={2.5} color={colors.redDark} size={18} />
               <Text size={14} className="font-poppinsSemiBold text-redDark">
