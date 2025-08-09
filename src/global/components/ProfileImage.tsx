@@ -23,13 +23,13 @@ const ProfileImage: React.FC<{
     <View
       style={{
         ...imageStyle,
-        backgroundColor: colors.primary,
+        backgroundColor: colors.greenLight,
         justifyContent: "center",
         alignItems: "center",
       }}
     >
       <Text
-        className="font-poppinsSemiBold text-white"
+        className="font-poppinsBold text-primary"
         size={size > 52 ? 34 : 24}
       >
         {getInitials(data?.name || "")}

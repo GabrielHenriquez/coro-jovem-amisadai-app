@@ -19,7 +19,7 @@ const MemberCard = ({
         borderWidth: 1,
         borderColor: "#CCC",
         paddingVertical: 7,
-        elevation: 3,
+        elevation: 4,
         gap: 20,
       }}
       onPress={() => onPress(member?.id)}

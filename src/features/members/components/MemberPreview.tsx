@@ -44,7 +44,7 @@ const MemberDetailItem: React.FC<MemberDetailItemProps> = ({
 
 const MemberHeader: React.FC<{ member: IMember }> = ({ member }) => (
   <RN.View className="gap-2 mt-4 items-center">
-    <Component.Text size={20} className="font-poppinsMedium leading-none">
+    <Component.Text size={22} className="font-poppinsSemiBold leading-none">
       {member?.name}
     </Component.Text>
 
@@ -148,7 +148,7 @@ const MemberPreview: React.FC<MemberPreviewProps> = ({
           name: memberPressed?.name,
           uri: memberPressed?.profileImageUri,
         }}
-        size={94}
+        size={90}
       />
       <MemberHeader member={memberPressed} />
       <MemberDetails member={memberPressed} />

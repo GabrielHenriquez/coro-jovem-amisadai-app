@@ -19,7 +19,7 @@ const BaseBottomSheet = forwardRef<BottomSheetModal, BaseBottomSheetProps>(
   ({ children, indicatorColor, withMorePaddingBottom = true, ...props }, ref) => {
     const { bottom } = useSafeAreaInsets();
     const { dismiss } = useBottomSheetModal();
-    const paddingBottom = withMorePaddingBottom ? 40 : 0;
+    const paddingBottom = withMorePaddingBottom ? 30 : 0;
 
     return (
       <BottomSheetModal
@@ -54,7 +54,7 @@ const BaseBottomSheet = forwardRef<BottomSheetModal, BaseBottomSheetProps>(
           marginBottom: 12,
           borderRadius: 12,
           width: 124,
-          height: 20,
+          height: 18,
         }}
       >
         <BottomSheetView style={{ paddingBottom }}>
