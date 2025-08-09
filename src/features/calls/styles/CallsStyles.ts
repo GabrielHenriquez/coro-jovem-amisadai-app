@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "Rubik_500Medium",
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 24,
   },
   headerStyle: {
     borderBottomWidth: 0.5,
@@ -68,18 +68,19 @@ const styles = StyleSheet.create({
   },
   selected: {
     color: "#4C5E46",
-    fontSize: 22,
+    fontSize: 24,
     fontFamily: "Rubik_600SemiBold",
     marginTop: 12,
   },
   dayText: {
     color: "#E8E8E8",
     fontFamily: "Rubik_600SemiBold",
+    fontSize: 16,
     lineHeight: 20,
   },
   day: {
-    width: 30,
-    height: 30,
+    width: 34,
+    height: 36,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 7,
