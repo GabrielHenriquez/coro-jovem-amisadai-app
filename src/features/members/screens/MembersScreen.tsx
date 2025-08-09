@@ -74,8 +74,8 @@ const Members = () => {
   useFocusEffect(
     useCallback(() => {
       if (scrollYRef.current !== 0) scrollToTop();
-      if (debouncedSearchTerm) setSearchTerm("");
-    }, [scrollToTop])
+      if (debouncedSearchTerm || searchTerm) setSearchTerm("");
+    }, [])
   );
 
   return (
