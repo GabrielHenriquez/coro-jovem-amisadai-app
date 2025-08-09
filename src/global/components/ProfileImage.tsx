@@ -29,7 +29,7 @@ const ProfileImage: React.FC<{
       }}
     >
       <Text
-        className="font-poppinsBold text-primary"
+        className="font-poppinsSemiBold text-primary"
         size={size > 52 ? 34 : 24}
       >
         {getInitials(data?.name || "")}

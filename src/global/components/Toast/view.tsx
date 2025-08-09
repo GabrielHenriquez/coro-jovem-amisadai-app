@@ -11,11 +11,14 @@ const Toast = ({ message, visible, onHide }: IToast) => {
   return (
     <Animated.View style={[styles.Toast, VIEW_MODEL.animatedStyle || {}]}>
       <RN.View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
-        <RN.View className="w-10 h-10 rounded-3xl bg-primary items-center justify-center">
-          <Check strokeWidth={3} color={"#FFF"} />
+        <RN.View
+          style={{ width: 28, height: 28, borderRadius: 14 }}
+          className=" bg-primary items-center justify-center"
+        >
+          <Check size={20} strokeWidth={3} color={"#FFF"} />
         </RN.View>
 
-        <Text className="font-poppinsMedium">{message}</Text>
+        <Text size={15} className="font-poppinsMedium">{message}</Text>
       </RN.View>
     </Animated.View>
   );
