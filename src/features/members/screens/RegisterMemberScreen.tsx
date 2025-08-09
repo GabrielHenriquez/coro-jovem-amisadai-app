@@ -433,16 +433,6 @@ const RegisterMemberScreen = () => {
           </Text>
         </Button>
       </KeyboardAwareScrollView>
-
-      <Toast
-        message={
-          member?.id
-            ? "Componente editado com sucesso!"
-            : "Componente criado com sucesso!"
-        }
-        onHide={() => VM?.setVisibleToast(false)}
-        visible={VM?.visibleToast}
-      />
     </RN.View>
   );
 };
