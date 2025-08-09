@@ -39,9 +39,7 @@ interface CalendarMonth {
 }
 
 export default function CallScreen() {
-  const [day, setDay] = useState<DateData | undefined>();
   const [currentMonthFormatted, setCurrentMonthFormatted] = useState("");
-
   const { navigate } = useNavigation<DrawerNavigationProp<DrawerParamList>>();
   const [pdfUri, setPdfUri] = useState<string | null>(null);
   const [loadingEventPreview, setLoadingEventPreview] = useState(false);
@@ -59,6 +57,7 @@ export default function CallScreen() {
     toggleCalendar,
     bottomSheetModalRef,
     callPreviewModalRef,
+    setSelectedDate,
     validate,
     handleDeleteEvent,
     isLoadingDelete,
@@ -67,7 +66,7 @@ export default function CallScreen() {
   } = useCalls();
 
   const calendarHeight = useMemo(
-    () => (opennedCalendar ? 355 : 150),
+    () => (opennedCalendar ? 370 : 155),
     [opennedCalendar]
   );
 
@@ -98,9 +97,7 @@ export default function CallScreen() {
 
   // Memoized PDF validation effect
   useEffect(() => {
-    if (pdfUri) {
-      validate();
-    }
+    if (pdfUri) validate();
   }, [pdfUri, validate]);
 
   // Memoized share PDF function
@@ -217,7 +214,9 @@ export default function CallScreen() {
       headerStyle: styles.headerStyle,
       theme: calendarTheme,
       customHeaderTitle: calendarHeader,
-      markedDates: day ? { [day.dateString]: { selected: true } } : undefined,
+      markedDates: selectedDate
+        ? { [selectedDate as string]: { selected: true } }
+        : undefined,
       dayComponent: (props: {
         date?: DateData;
         state?: DayState;
@@ -226,15 +225,12 @@ export default function CallScreen() {
         <CalendarDay
           {...props}
           isExpanded={opennedCalendar}
-          date={props.date!}
-          state={props.state!}
-          day={day!}
-          setDay={setDay}
-          test={getEventsByDateToCard}
+          day={selectedDate!}
+          getEventsByDateToCard={getEventsByDateToCard}
         />
       ),
     }),
-    [day, calendarTheme, calendarHeader, getEventsByDateToCard]
+    [calendarTheme, calendarHeader, getEventsByDateToCard, selectedDate]
   );
 
   // Memoized month change handler
@@ -275,7 +271,7 @@ export default function CallScreen() {
 
   // Memoized current date display
   const currentDateDisplay = useMemo(
-    () => formatDateDisplay(selectedDate),
+    () => formatDateDisplay(selectedDate!),
     [selectedDate, formatDateDisplay]
   );
 
@@ -311,9 +307,7 @@ export default function CallScreen() {
                   {...sharedCalendarProps}
                   onCalendarToggled={toggleCalendar}
                   onDayPress={(day) => {
-                    if (day?.dateString) {
-                      handleDayPress(day.dateString);
-                    }
+                    if (day?.dateString) handleDayPress(day.dateString);
                   }}
                   disablePan
                   onMonthChange={handleMonthChange}
@@ -395,7 +389,7 @@ export default function CallScreen() {
                   resizeMode="contain"
                 />
                 <Text className="font-poppinsSemiBold text-center text-black">
-                  Nenhuma chamada registrada na {currentDateDisplay}.
+                  Nenhuma chamada registrada: {currentDateDisplay}.
                 </Text>
               </RN.View>
             )}
@@ -501,6 +495,7 @@ export default function CallScreen() {
                 height: getHeight * 0.05,
               }}
               activeLoading={isLoadingDelete}
+              activeLoadingColor="redDark"
               onPress={handleDeleteCall}
             >
               <Trash2 strokeWidth={2.5} color={colors.redDark} size={18} />

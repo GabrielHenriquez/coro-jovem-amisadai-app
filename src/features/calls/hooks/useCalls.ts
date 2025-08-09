@@ -3,13 +3,14 @@ import { useEventsQueries } from "../infra/queryAdapters/useEventsQueries";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { IEvent } from "../domain/entities/Events";
 import { useQueryClient } from "@tanstack/react-query";
+import { DateData } from "react-native-calendars";
 
 export const useCalls = () => {
   const formatoAmericano = new Date().toISOString().split("T")[0];
   const queryClient = useQueryClient();
   const [opennedCalendar, setOpennedCalendar] = useState(false);
   const [showToastDelete, setShowToastDelete] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(
+  const [selectedDate, setSelectedDate] = useState<string | undefined>(
     formatoAmericano
   );
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -96,6 +97,7 @@ export const useCalls = () => {
     setOpennedCalendar,
     handleModalAction,
     handleGetEvent,
+    setSelectedDate,
     loadingData:
       getDotsQuery.isLoading ||
       getEventsQuery.isLoading ||
