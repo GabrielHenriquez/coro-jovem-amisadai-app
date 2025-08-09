@@ -9,28 +9,23 @@ const CalendarDay = memo(
     isExpanded,
     state,
     marking,
-    test,
+    getEventsByDateToCard,
     day,
-    setDay,
   }: {
-    test: any;
-    date: DateData;
+    getEventsByDateToCard: (date: string) => void;
+    date?: DateData;
     isExpanded: boolean;
-    state: DayState;
-    marking?: any; // importante: aqui vem dots, selected etc.
-    day: DateData;
-    setDay: React.Dispatch<React.SetStateAction<DateData | undefined>>;
+    state?: DayState;
+    marking?: any;
+    day: string;
   }) => {
     if (!date) return null;
 
-    const isSelected = date.dateString === day?.dateString;
+    const isSelected = date.dateString === day;
     const dots = marking?.dots || [];
     const memoizedDots = useMemo(() => dots, [dots]);
     const handlePress = () => {
-      if (!isSelected) {
-        test(date.dateString);
-        setDay(date);
-      }
+      if (!isSelected) getEventsByDateToCard(date.dateString);
     };
 
     return (
@@ -53,13 +48,13 @@ const CalendarDay = memo(
           {date.day}
         </RN.Text>
 
-        <RN.View style={{ flexDirection: "row", gap: 0.5 }}>
+        <RN.View style={{ flexDirection: "row", gap: 0.5, marginTop: 0.5 }}>
           {memoizedDots.map((dot: any, index: number) => (
             <RN.View
               key={index}
               style={{
-                width: 6.5,
-                height: 6.5,
+                width: 7,
+                height: 7,
                 borderRadius: 3,
                 backgroundColor: dot.color || "#F06543",
                 marginHorizontal: 1,
@@ -71,7 +66,7 @@ const CalendarDay = memo(
     );
   },
   (prev, next) =>
-    prev.date.dateString === next.date.dateString &&
+    prev.date?.dateString === next.date?.dateString &&
     prev.state === next.state &&
     prev.marking === next.marking
 );
