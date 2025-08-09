@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { IMember } from "../domain/entities/Member";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMemberStore } from "../stores/membersStore";
+import { Keyboard } from "react-native";
 
 const membersRepo = new FirebaseMembersRepository();
 const membersUseCase = new MembersUseCase(membersRepo);
@@ -48,7 +49,10 @@ const useMembers = () => {
   };
 
   useEffect(() => {
-    if (memberSelected) handlePresentModalPress();
+    if (memberSelected) {
+      Keyboard.dismiss();
+      handlePresentModalPress();
+    }
   }, [memberSelected]);
 
   return {
