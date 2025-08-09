@@ -49,7 +49,7 @@ const MemberCard = ({
           <RN.View className="flex-row gap-1.5 items-center right-0.5">
             <Mic2 color={colors.gray} size={16} />
             <Text
-              size={14}
+              size={15}
               className="font-poppinsMedium text-gray leading-none"
             >
               {member?.suit} • {calcularIdade(member?.birthDate)} anos
