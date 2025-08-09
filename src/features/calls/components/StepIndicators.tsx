@@ -38,10 +38,10 @@ const StepIndicators = () => {
   return (
     <View
       style={{ borderBottomLeftRadius: 35, borderBottomRightRadius: 35 }}
-      className=" bg-primary pt-2 pb-7"
+      className=" bg-primary pt-1 pb-7"
     >
       <Text
-        style={{ color: colors.background }}
+        style={{ color: "#e2ebd8" }}
         size={22}
         className="font-poppinsBold text-center "
       >
@@ -52,7 +52,7 @@ const StepIndicators = () => {
         {indicators.map((anim, index) => {
           const backgroundColor = anim.interpolate({
             inputRange: [0, 1],
-            outputRange: [colors.background, "#f76845"],
+            outputRange: [colors.background, "#ff5429"],
           });
 
           const width = anim.interpolate({
