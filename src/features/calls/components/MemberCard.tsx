@@ -18,9 +18,10 @@ const MemberCard = ({
     <RN.TouchableOpacity
       style={{
         borderWidth: 1.5,
-        borderColor: isSelected ? "#ffffff" : "#CCC",
+        borderColor:  "#CCC",
         paddingVertical: 5,
         backgroundColor: isSelected ? "#7f917c" : colors.white,
+        elevation: 1,
         gap: 18,
       }}
       className="px-5 rounded-2xl flex-row items-center"
