@@ -3,6 +3,7 @@ import Text from "@components/Text";
 import { colors } from "@styles/colors";
 import { IMember } from "@features/members/domain/entities/Member";
 import { useCreateCallContext } from "../contexts/CreateCallContext";
+import ProfileImage from "@components/ProfileImage";
 
 const MemberCard = ({
   item,
@@ -39,17 +40,9 @@ const MemberCard = ({
       />
 
       <RN.View className="gap-3 flex-row items-center">
-        <RN.Image
-          source={{
-            uri: item?.profileImageUri,
-          }}
-          style={{
-            width: 38,
-            height: 38,
-            borderRadius: 30,
-            borderWidth: 1,
-            borderColor: isSelected ? colors.white : colors.gray2,
-          }}
+        <ProfileImage
+          data={{ name: item?.name, uri: item?.profileImageUri }}
+          size={38}
         />
 
         <RN.View className="gap-1.5">
