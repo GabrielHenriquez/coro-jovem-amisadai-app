@@ -9,51 +9,66 @@ import MemberPreview from "../components/MemberPreview";
 import useMembers from "../hooks/useMembers";
 import * as Component from "@components/index";
 import * as RN from "react-native";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMemberStore } from "../stores/membersStore";
+import { IMember } from "../domain/entities/Member";
+import ScrollToTopButton from "../components/ScrollTopTopButton";
+
+// Constants
+const SCROLL_THRESHOLD = 400;
 
 const Members = () => {
-  const scrollY = useRef(new RN.Animated.Value(0)).current;
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 450);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+
   const flatListRef = useRef<RN.FlatList>(null);
   const scrollYRef = useRef(0);
+
   const {
     data,
     handleGetMember,
     bottomSheetModalRef,
     memberSelected,
-    visibleToast,
-    setVisibleToast,
     handleDeleteMember,
   } = useMembers();
+  const { getLabelToast, visibleToast, setVisibleToast } = useMemberStore();
 
-  const scrollToTop = () => {
-    RN.Animated.timing(scrollY, {
-      toValue: 0,
-      duration: 550,
-      useNativeDriver: true,
-    }).start(() => {
-      flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-    });
-  };
+  /**
+   * Scrolls the FlatList to the top with animation
+   */
+  const scrollToTop = useCallback(() => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
 
-  const handleScroll = (event: any) => {
-    scrollYRef.current = event.nativeEvent.contentOffset.y;
-  };
+  /**
+   * Handles scroll events and shows/hides the scroll to top button
+   */
+  const handleScroll = useCallback(
+    (event: RN.NativeSyntheticEvent<RN.NativeScrollEvent>) => {
+      const currentScrollY = event.nativeEvent.contentOffset.y;
+      scrollYRef.current = currentScrollY;
 
+      const shouldShowButton = currentScrollY > SCROLL_THRESHOLD;
+
+      setShowScrollToTop(shouldShowButton);
+    },
+    []
+  );
+
+  /**
+   * Filters members based on search term
+   */
   const filteredMembers = useMemo(() => {
     if (!data) return [];
 
-    if (!debouncedSearchTerm?.trim()) return data;
+    if (!debouncedSearchTerm?.trim()) return data as IMember[];
 
-    const filter = data.filter((item) =>
+    return (data as IMember[]).filter((item: IMember) =>
       item.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
-
-    return filter;
   }, [data, debouncedSearchTerm]);
 
-  useFocusEffect(useCallback(() => scrollToTop(), []));
+  useFocusEffect(useCallback(() => scrollToTop(), [scrollToTop]));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.primary }}>
@@ -97,7 +112,10 @@ const Members = () => {
           scrollEventThrottle={16}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <MemberCard member={item} onPress={handleGetMember} />
+            <MemberCard
+              member={item}
+              onPress={() => handleGetMember(item.id)}
+            />
           )}
           contentContainerClassName="gap-2.5 pb-16 px-6 mt-2"
           keyboardShouldPersistTaps="handled"
@@ -110,14 +128,19 @@ const Members = () => {
             memberSelected?.gender === "Masculino" ? "blueGender" : "pinkGender"
           }
         >
-          <MemberPreview
-            memberPressed={memberSelected}
-            handleDeleteMember={handleDeleteMember}
-          />
+          {memberSelected && (
+            <MemberPreview
+              memberPressed={memberSelected}
+              handleDeleteMember={handleDeleteMember}
+            />
+          )}
         </Component.BaseBottomSheet>
       </RN.View>
+
+      {showScrollToTop && <ScrollToTopButton onPress={scrollToTop} />}
+
       <Toast
-        message="Componente excluído com sucesso!"
+        message={`Componente ${getLabelToast()} com sucesso!`}
         onHide={() => setVisibleToast(false)}
         visible={visibleToast}
       />
