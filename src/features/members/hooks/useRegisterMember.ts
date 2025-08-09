@@ -50,7 +50,6 @@ const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
       let uri = "";
       if (profileImage)
         uri = await uploadImageStorage(data?.name, data?.memberCard);
-      console.log({ isEdit });
       return isEdit
         ? repository.updateMember({ ...data, id: isEdit, profileImageUri: uri })
         : repository.createMember({ ...data, profileImageUri: uri });
