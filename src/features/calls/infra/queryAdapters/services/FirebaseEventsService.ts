@@ -82,36 +82,37 @@ export class FirebaseEventsService implements IEventsRepository {
 
   async createDotToEventInDB({
     key,
+    oldKey,
     color,
     date,
   }: {
     key: string;
+    oldKey?: string;
     color: string;
     date: string;
   }): Promise<void> {
     const dotRef = doc(db, DB_COLLECTIONS.dots, date);
     const querySnapshot = await getDoc(dotRef);
-    const newDot = {
-      key,
-      color,
-    };
+    const newDot = { key, color };
 
     if (querySnapshot.exists()) {
       const dataResponse = querySnapshot.data();
-      const currentDots = dataResponse[date]?.dots.map((item: any) => {
-        return item;
-      });
+      const currentDots = dataResponse[date]?.dots || [];
 
-      const newDots = [...currentDots, newDot];
-      dataResponse[date].dots = newDots;
-      await setDoc(doc(db, DB_COLLECTIONS.dots, date), dataResponse);
+      const filteredDots = currentDots.filter(
+        (dot: { key: string }) =>
+          dot.key !== key && (oldKey ? dot.key !== oldKey : true)
+      );
+
+      const updatedDots = [...filteredDots, newDot];
+      dataResponse[date] = { ...dataResponse[date], dots: updatedDots };
+
+      await setDoc(dotRef, dataResponse);
     } else {
       const schemaDot = {
-        [date]: {
-          dots: [newDot],
-        },
+        [date]: { dots: [newDot] },
       };
-      await setDoc(doc(db, DB_COLLECTIONS.dots, date), schemaDot);
+      await setDoc(dotRef, schemaDot);
     }
   }
 
