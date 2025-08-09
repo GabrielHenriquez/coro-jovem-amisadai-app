@@ -1,13 +1,12 @@
 import { colors } from "@styles/colors";
 import { Image, View } from "react-native";
 import { getInitials } from "@utils/strings";
-import { IMember } from "@features/members/domain/entities/Member";
 import Text from "./Text";
 
-const ProfileImage: React.FC<{ member: IMember; size: number }> = ({
-  member,
-  size,
-}) => {
+const ProfileImage: React.FC<{
+  data: { name: string; uri: string | undefined };
+  size: number;
+}> = ({ data, size }) => {
   const imageStyle = {
     width: size,
     height: size,
@@ -16,10 +15,8 @@ const ProfileImage: React.FC<{ member: IMember; size: number }> = ({
     borderColor: colors.gray,
   };
 
-  if (member?.profileImageUri) {
-    return (
-      <Image source={{ uri: member.profileImageUri }} style={imageStyle} />
-    );
+  if (data?.uri) {
+    return <Image source={{ uri: data.uri }} style={imageStyle} />;
   }
 
   return (
@@ -31,8 +28,11 @@ const ProfileImage: React.FC<{ member: IMember; size: number }> = ({
         alignItems: "center",
       }}
     >
-      <Text className="font-poppinsSemiBold text-white" size={size > 52 ? 34 : 24}>
-        {getInitials(member?.name || "")}
+      <Text
+        className="font-poppinsSemiBold text-white"
+        size={size > 52 ? 34 : 24}
+      >
+        {getInitials(data?.name || "")}
       </Text>
     </View>
   );
