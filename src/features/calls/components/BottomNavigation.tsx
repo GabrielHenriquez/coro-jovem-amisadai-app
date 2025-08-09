@@ -6,10 +6,9 @@ import { colors } from "@styles/colors";
 import { View } from "react-native";
 import { useCreateCallContext } from "../contexts/CreateCallContext";
 
-
 const BottomNavigation = () => {
   const formValidator = useFormContext();
-  const { step, setStep, onSubmit, setDataForm, isLoading } =
+  const { step, setStep, onSubmit, setDataForm, isLoading, eventID } =
     useCreateCallContext();
   const insets = useSafeAreaInsets();
   const showBackButton = step > 0;
@@ -18,7 +17,7 @@ const BottomNavigation = () => {
       if (step >= 2) {
         onSubmit();
       } else {
-        if (step === 0) setDataForm(data);
+        if (step === 0) setDataForm(data as any);
         setStep((prev) => prev + 1);
       }
     },
@@ -30,7 +29,7 @@ const BottomNavigation = () => {
   const getLabelButton: Record<number, string> = {
     0: "Próximo",
     1: "Próximo",
-    2: "Criar chamada",
+    2: eventID ? "Editar chamada" : "Criar chamada",
   };
 
   return (
