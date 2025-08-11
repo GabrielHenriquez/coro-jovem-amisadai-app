@@ -3,10 +3,12 @@ import { colors } from "@styles/colors";
 import Text from "@components/Text";
 import { Music4 } from "lucide-react-native";
 import { useCreateCallContext } from "../contexts/CreateCallContext";
+import { ISong } from "../domain/entities/Songs";
 
-const SongCard = ({ item }: { item: string }) => {
-  const { validateIsActiveMusic, handleMusicSelected } = useCreateCallContext();
-  const isSelected = validateIsActiveMusic(item);
+const SongCard = ({ item }: { item: ISong }) => {
+  const { validateIsActiveMusic, handleMusicSelected, handleMenuMusic } =
+    useCreateCallContext();
+  const isSelected = validateIsActiveMusic(item.id);
 
   return (
     <TouchableOpacity
@@ -17,7 +19,8 @@ const SongCard = ({ item }: { item: string }) => {
         backgroundColor: isSelected ? "#7f917c" : colors.white,
       }}
       className="px-4 rounded-2xl flex-row items-center"
-      onPress={() => handleMusicSelected(item)}
+      onPress={() => handleMusicSelected(item.id)}
+      onLongPress={() => handleMenuMusic(item)}
     >
       <View className="gap-4 flex-row items-center">
         <Music4
@@ -32,7 +35,7 @@ const SongCard = ({ item }: { item: string }) => {
               isSelected ? "text-white" : "text-primary"
             }`}
           >
-            {item}
+            {item?.music}
           </Text>
         </View>
       </View>
