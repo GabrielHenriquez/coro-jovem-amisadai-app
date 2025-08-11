@@ -1,13 +1,15 @@
 import { FlatList } from "react-native";
 import SongCard from "./SongCard";
 import { useCreateCallContext } from "../contexts/CreateCallContext";
+import { ISong } from "../domain/entities/Songs";
 
 const SongsList = () => {
-  const { songsData } = useCreateCallContext();
+  const { dataList } = useCreateCallContext();
+
   return (
     <FlatList
-      data={songsData}
-      keyExtractor={(item) => item}
+      data={dataList as unknown as ISong[]}
+      keyExtractor={(item) => item.id}
       renderItem={({ item }) => <SongCard item={item} />}
       contentContainerStyle={{ gap: 8, paddingBottom: 5 }}
       keyboardShouldPersistTaps="handled"

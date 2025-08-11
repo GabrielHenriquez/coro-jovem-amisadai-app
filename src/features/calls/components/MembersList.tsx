@@ -1,13 +1,14 @@
 import { FlatList } from "react-native";
 import MemberCard from "./MemberCard";
 import { useCreateCallContext } from "../contexts/CreateCallContext";
+import { IMember } from "@features/members/domain/entities/Member";
 
 const MembersList = () => {
-  const { membersData } = useCreateCallContext();
+  const { dataList } = useCreateCallContext();
 
   return (
     <FlatList
-      data={membersData}
+      data={dataList as IMember[]}
       decelerationRate={0.86}
       scrollEventThrottle={16}
       keyboardShouldPersistTaps="handled"
