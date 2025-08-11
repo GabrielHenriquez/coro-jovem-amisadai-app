@@ -9,11 +9,13 @@ interface InputContentProps extends RN.ViewProps {
   children: ReactNode;
   errors: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
   icon?: ReactNode;
+  size?: number;
 }
 
 const InputContent = ({
   children,
   errors,
+  size = 0.052,
   icon,
   ...rest
 }: InputContentProps) => {
@@ -22,7 +24,7 @@ const InputContent = ({
       <RN.View
         className="w-full bg-white flex-row items-center rounded-xl"
         style={{
-          height: height * 0.052,
+          height: height * size,
           borderWidth: 1,
           borderColor: !!errors ? colors.redDark : colors.grayLight,
           elevation: 1,
@@ -31,7 +33,7 @@ const InputContent = ({
         {icon && (
           <RN.View
             style={{
-              height: height * 0.0521,
+              height: height * size + 0.001,
               right: 1,
             }}
             className="w-16 bg-primary rounded-l-xl justify-center items-center"
