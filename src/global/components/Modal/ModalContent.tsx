@@ -16,9 +16,9 @@ const ModalContent = ({ children, ...rest }: IProps) => {
       {...rest}
     >
       <RN.View
-        className="justify-center items-center px-14"
+        className="justify-center items-center px-10"
         style={{
-          height: height + RN.StatusBar?.currentHeight!,
+          height: height + RN.StatusBar.currentHeight!,
           backgroundColor: "rgba(0,0,0, 0.4)",
         }}
       >

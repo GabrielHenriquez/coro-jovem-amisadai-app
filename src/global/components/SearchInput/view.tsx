@@ -29,13 +29,13 @@ function SearchInput({
 
         {searchTerm && (
           <RN.TouchableOpacity
-            className="px-3"
+            className="px-2"
             onPress={() => {
               setSearchTerm("");
               RN.Keyboard.dismiss();
             }}
           >
-            <X color={colors.gray} />
+            <X color={colors.grayMedium} />
           </RN.TouchableOpacity>
         )}
       </RN.View>
