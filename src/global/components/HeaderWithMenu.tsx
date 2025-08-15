@@ -11,7 +11,7 @@ const HeaderWithMenu = ({ styleRest }: { styleRest?: RN.ViewStyle }) => {
         alignItems: "center",
         justifyContent: "center",
         paddingVertical: 8,
-        paddingTop: 18,
+        paddingTop: 20,
         ...styleRest,
       }}
     >

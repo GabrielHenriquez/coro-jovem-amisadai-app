@@ -2,6 +2,7 @@ import { colors } from "@styles/colors";
 import { Image, View } from "react-native";
 import { getInitials } from "@utils/strings";
 import Text from "./Text";
+import FastImage from "react-native-fast-image";
 
 const ProfileImage: React.FC<{
   data: { name: string; uri: string | undefined };
@@ -16,7 +17,16 @@ const ProfileImage: React.FC<{
   };
 
   if (data?.uri) {
-    return <Image source={{ uri: data.uri }} style={imageStyle} />;
+    return (
+      <FastImage
+        style={imageStyle}
+        source={{
+          uri: data.uri,
+          priority: FastImage.priority.high,
+        }}
+        resizeMode={FastImage.resizeMode.cover}
+      />
+    );
   }
 
   return (
