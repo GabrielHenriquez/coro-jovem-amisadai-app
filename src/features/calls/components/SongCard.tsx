@@ -8,7 +8,7 @@ import { ISong } from "../domain/entities/Songs";
 const SongCard = ({ item }: { item: ISong }) => {
   const { validateIsActiveMusic, handleMusicSelected, handleMenuMusic } =
     useCreateCallContext();
-  const isSelected = validateIsActiveMusic(item.id);
+  const isSelected = validateIsActiveMusic(item);
 
   return (
     <TouchableOpacity
@@ -19,7 +19,7 @@ const SongCard = ({ item }: { item: ISong }) => {
         backgroundColor: isSelected ? "#7f917c" : colors.white,
       }}
       className="px-4 rounded-2xl flex-row items-center"
-      onPress={() => handleMusicSelected(item.id)}
+      onPress={() => handleMusicSelected(item)}
       onLongPress={() => handleMenuMusic(item)}
     >
       <View className="gap-4 flex-row items-center">
