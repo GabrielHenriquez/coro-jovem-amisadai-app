@@ -8,10 +8,8 @@ import { IMember } from "../domain/entities/Member";
 import { calcularIdade } from "../utils/calculateAge";
 import { useNavigation } from "@react-navigation/native";
 import { useBottomSheet } from "@gorhom/bottom-sheet";
-import { getInitials } from "@utils/strings";
 import ProfileImage from "@components/ProfileImage";
 
-// Types
 interface MemberDetailItemProps {
   label: string;
   value: string | number;
@@ -88,7 +86,7 @@ const ActionButtons: React.FC<{
   member: IMember;
   onEdit: () => void;
   onDelete: () => void;
-}> = ({ member, onEdit, onDelete }) => (
+}> = ({ onEdit, onDelete }) => (
   <RN.View className="w-full gap-3">
     <Component.Button
       styleRest={{ height: getHeight * 0.054 }}
@@ -117,7 +115,6 @@ const ActionButtons: React.FC<{
   </RN.View>
 );
 
-// Main component
 const MemberPreview: React.FC<MemberPreviewProps> = ({
   memberPressed,
   handleDeleteMember,

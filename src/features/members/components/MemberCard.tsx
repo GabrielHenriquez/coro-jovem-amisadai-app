@@ -1,4 +1,5 @@
 import * as RN from "react-native";
+import { memo } from "react";
 import Text from "@components/Text";
 import { Mic2 } from "lucide-react-native";
 import { colors } from "@styles/colors";
@@ -6,13 +7,16 @@ import { IMember } from "../domain/entities/Member";
 import { calcularIdade } from "../utils/calculateAge";
 import ProfileImage from "@components/ProfileImage";
 
-const MemberCard = ({
-  onPress,
-  member,
-}: {
-  onPress: VoidFunction;
+interface MemberCardProps {
+  onPress: (id: string) => void;
   member: IMember;
-}) => {
+}
+
+const MemberCard: React.FC<MemberCardProps> = memo(({ onPress, member }) => {
+  const handlePress = () => {
+    onPress(member?.id);
+  };
+
   return (
     <RN.TouchableOpacity
       style={{
@@ -22,7 +26,7 @@ const MemberCard = ({
         elevation: 4,
         gap: 20,
       }}
-      onPress={() => onPress(member?.id)}
+      onPress={handlePress}
       className="px-5 bg-white rounded-2xl flex-row items-center"
     >
       <RN.View
@@ -59,6 +63,8 @@ const MemberCard = ({
       </RN.View>
     </RN.TouchableOpacity>
   );
-};
+});
+
+MemberCard.displayName = "MemberCard";
 
 export default MemberCard;

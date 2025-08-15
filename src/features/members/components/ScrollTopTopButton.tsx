@@ -2,19 +2,13 @@ import { colors } from "@styles/colors";
 import { ArrowUp } from "lucide-react-native";
 import * as RN from "react-native";
 
-// Constants
-const SCROLL_TO_TOP_BUTTON_SIZE = 42; // Size of the scroll to top button
-const SCROLL_TO_TOP_BUTTON_RADIUS = 14; // Border radius of the scroll to top button
+const SCROLL_TO_TOP_BUTTON_SIZE = 42;
+const SCROLL_TO_TOP_BUTTON_RADIUS = 14;
 
-// Types
 interface ScrollToTopButtonProps {
   onPress: () => void;
 }
 
-// Components
-/**
- * Scroll to top button component that appears when user scrolls down
- */
 export const ScrollToTopButton: React.FC<ScrollToTopButtonProps> = ({
   onPress,
 }) => (
