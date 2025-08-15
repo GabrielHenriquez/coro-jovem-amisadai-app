@@ -1,3 +1,5 @@
+import { ISong } from "./Songs";
+
 export interface IEventCard {
   id: string;
   title: string;
@@ -19,7 +21,7 @@ export interface IEvent {
   date: string;
   local: string;
   components: Array<{ name: string; id: string; gender: string; suit: string }>;
-  musics: string[];
+  musics: ISong[];
   missingComponents: Array<{ name: string; id: string; gender: string; suit: string }>;
   numberSearchDoc: number;
 }
