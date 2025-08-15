@@ -2,6 +2,8 @@ import { formatDateToBR } from "@features/members/utils/formatDate";
 import { IEvent } from "../domain/entities/Events";
 
 const htmlContent = (event: IEvent) => {
+  const musics = event?.musics?.map(({ music }) => music).join(", ");
+
   return `<html lang="pt-BR">
 
 <head>
@@ -141,7 +143,7 @@ const htmlContent = (event: IEvent) => {
                 : "IEADPE - Casa Amarela"
             }</div>
             <div><strong>Chamada por:</strong> ${event?.scheduleBy}</div>
-            <div><strong>Músicas:</strong> ${event?.musics?.join(", ")}</div>
+            <div><strong>Músicas:</strong> ${musics}</div>
         </div>
 
 

@@ -10,8 +10,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderBottomLeftRadius: 55,
     borderBottomRightRadius: 55,
-    paddingBottom: 10,
-    marginBottom: 10,
+    paddingBottom: 8,
   },
   logo: {
     width: 120,
