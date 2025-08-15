@@ -20,13 +20,13 @@ export const useLogin = () => {
       password: string;
     }) => {
       const user = await loginUseCase.execute(email, password);
-      console.log("✅ Login feito com sucesso:", user);
+      console.log("✅ Login feito com sucesso:", user?.email);
       return user;
     },
     onSuccess: async (user) => {
       await secureStorage.saveAuth(user);
       const userData = await FirebaseAuthService.getUser(user.uid);
-      console.log("✅ Usuário obtido com sucesso:", userData);
+      console.log("✅ Usuário obtido com sucesso:", userData?.name);
       setUser({ email: user?.email, uid: user?.uid, ...userData });
     },
   });
