@@ -1,81 +1,76 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@styles/colors";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { useDebounce } from "use-debounce";
 import { useMemberStore } from "../stores/membersStore";
 import { IMember } from "../domain/entities/Member";
 import Toast from "@components/Toast/view";
-import MemberCard from "../components/MemberCard";
 import MemberPreview from "../components/MemberPreview";
 import useMembers from "../hooks/useMembers";
 import ScrollToTopButton from "../components/ScrollTopTopButton";
 import * as Component from "@components/index";
 import * as RN from "react-native";
-import { getHeight } from "@utils/index";
 
-// Constants
-const SCROLL_THRESHOLD = 400;
+import { useScrollToTop } from "../hooks/useScrollToTop";
+import { useImagePreload } from "../hooks/useImagePreload";
+import { useMemberSearch } from "../hooks/useMemberSearch";
+import { useDeleteConfirmation } from "../hooks/useDeleteConfirmation";
+
+import MembersHeader from "../components/MembersHeader";
+import MembersList from "../components/MembersList";
+import MembersListShimmer from "../components/MembersListShimmer";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 
 const Members = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 450);
-  const [showScrollToTop, setShowScrollToTop] = useState(false);
-  const [hasMemberToDelete, setHasMemberToDelete] = useState<IMember | null>(
-    null
-  );
-  const flatListRef = useRef<RN.FlatList>(null);
-  const scrollYRef = useRef(0);
-
   const {
     data,
+    isSuccess,
     handleGetMember,
     bottomSheetModalRef,
     memberSelected,
     handleDeleteMember,
   } = useMembers();
+
   const { getLabelToast, visibleToast, setVisibleToast } = useMemberStore();
 
-  /**
-   * Scrolls the FlatList to the top with animation
-   */
-  const scrollToTop = useCallback(() => {
-    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-  }, []);
+  const {
+    showScrollToTop,
+    flatListRef,
+    scrollToTop,
+    handleScroll,
+    resetScrollPosition,
+    forceScrollToTop,
+  } = useScrollToTop();
 
-  /**
-   * Handles scroll events and shows/hides the scroll to top button
-   */
-  const handleScroll = useCallback(
-    (event: RN.NativeSyntheticEvent<RN.NativeScrollEvent>) => {
-      const currentScrollY = event.nativeEvent.contentOffset.y;
-      scrollYRef.current = currentScrollY;
-
-      const shouldShowButton = currentScrollY > SCROLL_THRESHOLD;
-
-      setShowScrollToTop(shouldShowButton);
-    },
-    []
-  );
-
-  /**
-   * Filters members based on search term
-   */
-  const filteredMembers = useMemo(() => {
-    if (!data) return [];
-
-    if (!debouncedSearchTerm?.trim()) return data as IMember[];
-
-    return (data as IMember[]).filter((item: IMember) =>
-      item.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-    );
-  }, [data, debouncedSearchTerm]);
+  const { fastImageLoaded } = useImagePreload(data as IMember[], isSuccess);
 
   useFocusEffect(
     useCallback(() => {
-      if (scrollYRef.current !== 0) scrollToTop();
-      if (debouncedSearchTerm || searchTerm) setSearchTerm("");
+      resetScrollPosition();
     }, [])
+  );
+
+  const { searchTerm, setSearchTerm, filteredMembers, resetSearch } =
+    useMemberSearch(data as IMember[]);
+
+  const { hasMemberToDelete, openDeleteConfirmation, closeDeleteConfirmation } =
+    useDeleteConfirmation();
+
+  useFocusEffect(
+    useCallback(() => {
+      resetSearch();
+    }, [resetSearch])
+  );
+
+  useEffect(() => {
+    if (searchTerm === "" && filteredMembers.length > 0) forceScrollToTop();
+  }, [searchTerm, filteredMembers.length, forceScrollToTop]);
+
+  const handleDeleteConfirm = useCallback(
+    (member: IMember) => {
+      handleDeleteMember(member);
+    },
+    [handleDeleteMember]
   );
 
   return (
@@ -90,45 +85,24 @@ const Members = () => {
         }}
         className="flex-1 bg-background pt-4"
       >
-        <RN.View className="gap-4 px-4">
-          <Component.Text
-            className="text-center font-poppinsBold text-primary"
-            size={24}
-          >
-            Componentes
-          </Component.Text>
-
-          <Component.SearchInput
-            styleRest={{ paddingHorizontal: 16 }}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
-
-          <Component.Text className="text-center font-poppinsSemiBold text-gray">
-            {searchTerm && filteredMembers?.length === 0
-              ? "Nenhum componente encontrado"
-              : `Quantidade de componentes: ${filteredMembers?.length}`}
-          </Component.Text>
-        </RN.View>
+        <MembersHeader
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filteredMembersCount={filteredMembers.length}
+        />
 
         <Component.Spacer height={10} />
 
-        <RN.FlatList
-          data={filteredMembers}
-          ref={flatListRef}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <MemberCard
-              member={item}
-              onPress={() => handleGetMember(item.id)}
-            />
-          )}
-          contentContainerClassName="gap-2.5 pb-16 px-6 mt-2"
-          keyboardShouldPersistTaps="handled"
-          decelerationRate={0.87}
-        />
+        {fastImageLoaded ? (
+          <MembersList
+            data={filteredMembers}
+            onMemberPress={handleGetMember}
+            flatListRef={flatListRef}
+            onScroll={handleScroll}
+          />
+        ) : (
+          <MembersListShimmer itemCount={8} />
+        )}
 
         <Component.BaseBottomSheet
           ref={bottomSheetModalRef}
@@ -139,7 +113,7 @@ const Members = () => {
           {memberSelected && (
             <MemberPreview
               memberPressed={memberSelected}
-              handleDeleteMember={() => setHasMemberToDelete(memberSelected)}
+              handleDeleteMember={openDeleteConfirmation}
             />
           )}
         </Component.BaseBottomSheet>
@@ -153,32 +127,12 @@ const Members = () => {
         visible={visibleToast}
       />
 
-      <Component.Modal.Root>
-        <Component.Modal.Content visible={!!hasMemberToDelete}>
-          <Component.Modal.AreaCloseModal
-            onClose={() => setHasMemberToDelete(null)}
-          />
-          <Component.Spacer height={16} />
-          <Component.Modal.Title>
-            Tem certeza que deseja excluir?
-          </Component.Modal.Title>
-          <Component.Modal.Subtitle>
-            Essa ação não pode ser desfeita.
-          </Component.Modal.Subtitle>
-          <Component.Button
-            styleRest={{ height: getHeight * 0.048 }}
-            bgColor="redDark"
-            onPress={() => {
-              setHasMemberToDelete(null);
-              handleDeleteMember(hasMemberToDelete as IMember);
-            }}
-          >
-            <Component.Text className="text-white font-poppinsSemiBold">
-              Excluir
-            </Component.Text>
-          </Component.Button>
-        </Component.Modal.Content>
-      </Component.Modal.Root>
+      <DeleteConfirmationModal
+        visible={!!hasMemberToDelete}
+        memberToDelete={hasMemberToDelete}
+        onClose={closeDeleteConfirmation}
+        onConfirm={handleDeleteConfirm}
+      />
     </SafeAreaView>
   );
 };
