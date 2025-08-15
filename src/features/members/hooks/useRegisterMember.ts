@@ -9,6 +9,11 @@ import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { useMemberStore } from "../stores/membersStore";
 
+type MemberDataWithId = FormDataRegisterMember & {
+  id?: string;
+  profileImageUri?: string;
+};
+
 const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
   const repository = new FirebaseMembersRepository();
   const queryClient = useQueryClient();
@@ -51,9 +56,18 @@ const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
       let uri = "";
       if (profileImage)
         uri = await uploadImageStorage(data?.name, data?.memberCard);
-      return isEdit
-        ? repository.updateMember({ ...data, id: isEdit, profileImageUri: uri })
-        : repository.createMember({ ...data, profileImageUri: uri });
+
+      const memberData: MemberDataWithId = {
+        ...data,
+        profileImageUri: uri,
+      };
+
+      if (isEdit) {
+        memberData.id = isEdit;
+        return repository.updateMember(memberData);
+      } else {
+        return repository.createMember(memberData);
+      }
     },
     onSuccess: () => {
       const action = isEdit ? "edit" : "create";

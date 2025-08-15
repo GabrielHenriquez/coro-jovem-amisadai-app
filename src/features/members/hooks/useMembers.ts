@@ -22,14 +22,14 @@ const useMembers = () => {
   const queryGetMembers = useQuery({
     queryKey: ["members"],
     queryFn: async () => {
-      const members = await membersUseCase.execute("getMembers");
+      const members = (await membersUseCase.execute("getMembers")) as IMember[];
       console.log("✅ Membros obtidos com sucesso:", members.length);
       return members;
     },
   });
 
   const handleGetMember = async (id: string) => {
-    const member = await membersUseCase.execute("getMember", id);
+    const member = (await membersUseCase.execute("getMember", id)) as IMember;
     console.log("✅ Membro mostrado com sucesso:", member?.name);
     setMemberSelected(member);
   };
@@ -40,8 +40,13 @@ const useMembers = () => {
     name,
     profileImageUri,
   }: IMember) => {
+    if (!id || !name || !memberCard || !profileImageUri) {
+      console.error("Missing required fields for deletion");
+      return;
+    }
+
     await membersRepo.deleteMember({ memberCard, name, id, profileImageUri });
-    bottomSheetModalRef.current?.close(), 1000;
+    bottomSheetModalRef.current?.close();
     queryClient.invalidateQueries({
       queryKey: ["members"],
     });
@@ -60,6 +65,7 @@ const useMembers = () => {
     bottomSheetModalRef,
     data: queryGetMembers.data,
     isLoading: queryGetMembers.isLoading,
+    isSuccess: queryGetMembers.isSuccess,
     handleGetMember,
     memberSelected,
   };
