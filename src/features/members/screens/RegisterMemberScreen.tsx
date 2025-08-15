@@ -18,16 +18,14 @@ import {
   User,
 } from "lucide-react-native";
 import useFormRegisterMember from "../hooks/forms/useFormRegisterMember";
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { UploadProfilePhoto } from "@assets/images";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import axios from "axios";
 import { useDebounce } from "use-debounce";
 import useRegisterMember from "../hooks/useRegisterMember";
-import Toast from "@components/Toast/view";
 import { IMember } from "../domain/entities/Member";
 
-// Types
 export type GenderValue = "Masculino" | "Feminino" | null;
 export type VoiceValue =
   | "Contralto"
@@ -44,13 +42,11 @@ interface RouteParams {
   member?: IMember;
 }
 
-// Constants
 const MALE_VOICES: VoiceValue[] = ["Baixo", "Barítono", "1º Tenor", "2º Tenor"];
 const FEMALE_VOICES: VoiceValue[] = ["Contralto", "1º Soprano", "2º Soprano"];
 const GENDERS: ("Masculino" | "Feminino")[] = ["Masculino", "Feminino"];
 const BAPTIZED_OPTIONS: ("Sim" | "Não")[] = ["Sim", "Não"];
 
-// Utility functions
 const handleGetAddressByZipCode = async (zipCode: string) => {
   try {
     const response = await axios.get(
@@ -64,7 +60,6 @@ const handleGetAddressByZipCode = async (zipCode: string) => {
   }
 };
 
-// Components
 const ProfileImageSection: React.FC<{
   profileImage: string;
   onPress: () => void;
@@ -305,7 +300,6 @@ const AddressSection: React.FC<{
   </RN.View>
 );
 
-// Main component
 const RegisterMemberScreen = () => {
   const { goBack } = useNavigation();
   const route = useRoute();
@@ -320,7 +314,6 @@ const RegisterMemberScreen = () => {
   const watchedGender = FORM.watch("gender");
   const [debouncedZipCode] = useDebounce(watchedZipCode, 350);
 
-  // Update suit options based on gender
   useEffect(() => {
     const isGenderMale = watchedGender === "Masculino";
     isGenderMale
@@ -328,7 +321,6 @@ const RegisterMemberScreen = () => {
       : setDataToDropdownSuit(FEMALE_VOICES);
   }, [watchedGender]);
 
-  // Fetch address by zip code
   useEffect(() => {
     const fetchAddress = async () => {
       if (debouncedZipCode?.length === 9) {
@@ -356,15 +348,12 @@ const RegisterMemberScreen = () => {
     [VM.onSubmit]
   );
 
-  // Reset screen state when it comes into focus
   useFocusEffect(
     useCallback(() => {
-      // Reset form and state when screen comes into focus
       if (!member) {
         FORM.reset();
         VM.setProfileImage("");
       } else {
-        // If editing a member, populate the form with member data
         FORM.setValue("name", member?.name || "");
         FORM.setValue("phone", member?.phone || "");
         FORM.setValue("birthDate", member?.birthDate || "");
@@ -377,12 +366,10 @@ const RegisterMemberScreen = () => {
         FORM.setValue("complement", member?.complement || "");
         VM.setProfileImage(member?.profileImageUri || "");
 
-        // Set suit data based on gender
         const isGenderMale = member?.gender === "Masculino";
         setDataToDropdownSuit(isGenderMale ? MALE_VOICES : FEMALE_VOICES);
       }
 
-      // Scroll to top
       setTimeout(() => {
         if (scrollViewRef.current) {
           scrollViewRef.current.scrollTo?.({ y: 0, animated: true });
