@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, ReactNode, useMemo } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useMemo,
+  useCallback,
+} from "react";
 import { FormProvider } from "react-hook-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useFormCreateCall from "../hooks/forms/useFormCreateCall";
@@ -14,6 +21,7 @@ import { useDebounce } from "use-debounce";
 import { Keyboard } from "react-native";
 import { useSongsQueries } from "../infra/queryAdapters/useSongsQueries";
 import { ISong } from "../domain/entities/Songs";
+import { useToastStore } from "../stores/useToastStore";
 
 interface CreateCallFormData {
   hour: string;
@@ -30,14 +38,14 @@ interface CreateCallContextType {
   eventID: string | null;
   setEventID: React.Dispatch<React.SetStateAction<string | null>>;
   setOldType: React.Dispatch<React.SetStateAction<string | null>>;
-  dataList: IMember[] | string[];
+  dataList: IMember[] | ISong[];
   validateIsActive: (id: string) => boolean;
-  validateIsActiveMusic: (id: string) => boolean;
+  validateIsActiveMusic: (music: ISong) => boolean;
   setMembersSelected: React.Dispatch<React.SetStateAction<IMember[]>>;
-  setSongsData: React.Dispatch<React.SetStateAction<string[]>>;
+  setSongsSelected: React.Dispatch<React.SetStateAction<ISong[]>>;
   resetAll: () => void;
   handleItemSelected: (item: IMember) => void;
-  handleMusicSelected: (id: string) => void;
+  handleMusicSelected: (music: ISong) => void;
   handleMenuMusic: (item: ISong) => void;
   onSubmit: () => void;
   isLoading: boolean;
@@ -45,8 +53,6 @@ interface CreateCallContextType {
   setDataForm: React.Dispatch<
     React.SetStateAction<CreateCallFormData | undefined>
   >;
-  visibleToast: boolean;
-  setVisibleToast: React.Dispatch<React.SetStateAction<boolean>>;
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   visibleMenuMusic: boolean;
@@ -62,66 +68,67 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
   const { goBack } = useNavigation();
   const { createEventMutation } = useEventsQueries();
   const queryClient = useQueryClient();
+  const { setMessage } = useToastStore();
 
-  // State management
   const [step, setStep] = useState(0);
-  const [visibleToast, setVisibleToast] = useState(false);
   const [eventID, setEventID] = useState<string | null>(null);
   const [oldType, setOldType] = useState<string | null>(null);
   const [membersSelected, setMembersSelected] = useState<IMember[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 450);
-  const [songsSelected, setSongsSelected] = useState<string[]>([]);
+  const [songsSelected, setSongsSelected] = useState<ISong[]>([]);
   const [visibleMenuMusic, setVisibleMenuMusic] = useState(false);
   const [songPressed, setSongPressed] = useState<ISong | null>(null);
   const [dataForm, setDataForm] = useState<CreateCallFormData | undefined>();
 
-  // Dependencies
   const membersUseCase = new MembersUseCase(new FirebaseMembersRepository());
   const formValidator = useFormCreateCall();
   const { mutate, isPending } = createEventMutation;
-  const { getSongsQuery, createSongMutation, deleteSongMutation } =
-    useSongsQueries();
+  const { getSongsQuery } = useSongsQueries();
 
   const { data: songsData = [] } = getSongsQuery;
 
-  // Queries
   const { data: membersData = [] } = useQuery({
     queryKey: ["members"],
     queryFn: () => membersUseCase.execute("getMembers"),
   });
 
-  const generateDotKey = (
-    type: string,
-    date: string,
-    numberSearchDoc: string
-  ) => `${type}-${date}-${numberSearchDoc}`;
+  const generateDotKey = useCallback(
+    (type: string, date: string, numberSearchDoc: string) =>
+      `${type}-${date}-${numberSearchDoc}`,
+    []
+  );
 
-  // Event handlers
-  const handleItemSelected = (item: IMember) => {
+  const handleItemSelected = useCallback((item: IMember) => {
     setMembersSelected((prev) => {
       const exists = prev.some((member) => member.id === item.id);
       return exists
         ? prev.filter((member) => member.id !== item.id)
         : [...prev, item];
     });
-  };
+  }, []);
 
-  const handleMusicSelected = (id: string) => {
+  const handleMusicSelected = useCallback((music: ISong) => {
     setSongsSelected((prev) => {
-      const exists = prev.includes(id);
-      return exists ? prev.filter((m) => m !== id) : [...prev, id];
+      const exists = prev.some((m) => m.id === music.id);
+      return exists ? prev.filter((m) => m.id !== music.id) : [...prev, music];
     });
     Keyboard.dismiss();
-  };
+  }, []);
 
-  const validateIsActive = (id: string) =>
-    membersSelected.some((m) => m.id === id);
+  const validateIsActive = useCallback(
+    (id: string) => membersSelected.some((m) => m.id === id),
+    [membersSelected]
+  );
 
-  const validateIsActiveMusic = (music: string) =>
-    songsSelected.includes(music);
+  const validateIsActiveMusic = useCallback(
+    (music: ISong) => {
+      return songsSelected.some((m) => m.id === music.id);
+    },
+    [songsSelected]
+  );
 
-  const resetAll = () => {
+  const resetAll = useCallback(() => {
     setStep(0);
     formValidator.reset();
     setEventID(null);
@@ -129,9 +136,9 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
     setMembersSelected([]);
     setSongsSelected([]);
     setDataForm(undefined);
-  };
+  }, []);
 
-  const handleMissingComponents = () => {
+  const handleMissingComponents = useCallback(() => {
     if (!Array.isArray(membersData)) return [];
 
     const selectedIds = membersSelected.map((m) => m.id);
@@ -143,12 +150,11 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
         suit: suit || "Não informado",
         name,
       }));
-  };
+  }, [membersData, membersSelected]);
 
-  const handleGetEventData = () => {
+  const handleGetEventData = useCallback(() => {
     if (!dataForm) throw new Error("Form data is required");
-
-    const numberRandom = Math.floor(Math.random() * 151);
+    const numberRandom = Math.floor(Math.random() * 100);
 
     const dataFormEvent: IEvent = {
       hour: dataForm.hour,
@@ -179,12 +185,22 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return { dataFormEvent, dataFormEventCard };
-  };
+  }, [
+    dataForm,
+    songsSelected,
+    membersSelected,
+    eventID,
+    user,
+    handleMissingComponents,
+  ]);
 
-  const handleCreateEvent = () => {
+  const handleCreateEvent = useCallback(() => {
     try {
       const { dataFormEvent, dataFormEventCard } = handleGetEventData();
       const isEdit = !!eventID;
+      const message = isEdit
+        ? "Chamada editada com sucesso!"
+        : "Chamada criada com sucesso!";
 
       mutate(
         {
@@ -201,11 +217,14 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
         },
         {
           onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["events"] });
-            queryClient.invalidateQueries({ queryKey: ["dots"] });
-            goBack();
+            Promise.all([
+              queryClient.invalidateQueries({ queryKey: ["events"] }),
+              queryClient.invalidateQueries({ queryKey: ["dots"] }),
+            ]);
             resetAll();
-            setVisibleToast(true);
+            goBack();
+
+            setTimeout(() => setMessage(message), 250);
           },
           onError: (error) => {
             console.error("Error creating event:", error);
@@ -215,61 +234,99 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error creating event:", error);
     }
-  };
+  }, [
+    handleGetEventData,
+    eventID,
+    oldType,
+    generateDotKey,
+    mutate,
+    queryClient,
+    resetAll,
+    goBack,
+    setMessage,
+  ]);
 
-  const handleMenuMusic = (music: ISong) => {
+  const handleMenuMusic = useCallback((music: ISong) => {
     setSongPressed(music);
     setVisibleMenuMusic(true);
-  };
+  }, []);
 
   const dataList = step === 2 ? songsData : membersData;
 
   const filteredDataList = useMemo(() => {
-    if (!dataList) return [];
+    if (!dataList || !Array.isArray(dataList)) return [];
 
     if (!debouncedSearchTerm?.trim()) return dataList;
 
-    return dataList.filter((item: ISong) => {
-      if (step === 2) {
-        return (item as ISong)?.music
-          .toLowerCase()
-          .includes(debouncedSearchTerm.toLowerCase());
-      }
+    const searchTermLower = debouncedSearchTerm.toLowerCase();
 
-      return (item as IMember).name
-        .toLowerCase()
-        .includes(debouncedSearchTerm.toLowerCase());
-    });
+    if (step === 2) {
+      // Filter songs
+      return (dataList as ISong[]).filter((item: ISong) =>
+        item?.music?.toLowerCase().includes(searchTermLower)
+      );
+    } else {
+      // Filter members
+      return (dataList as IMember[]).filter((item: IMember) =>
+        item?.name?.toLowerCase().includes(searchTermLower)
+      );
+    }
   }, [dataList, debouncedSearchTerm, step]);
 
-  const contextValue: CreateCallContextType = {
-    step,
-    setStep,
-    resetAll,
-    handleItemSelected,
-    validateIsActive,
-    validateIsActiveMusic,
-    setEventID,
-    setOldType,
-    setMembersSelected,
-    handleMusicSelected,
-    handleMenuMusic,
-    dataList: filteredDataList,
-    eventID,
-    setSongsData: setSongsSelected,
-    onSubmit: handleCreateEvent,
-    isLoading: isPending,
-    dataForm,
-    setDataForm,
-    visibleToast,
-    setVisibleToast,
-    searchTerm,
-    setSearchTerm,
-    visibleMenuMusic,
-    setVisibleMenuMusic,
-    songPressed,
-    setSongPressed,
-  };
+  const contextValue: CreateCallContextType = useMemo(
+    () => ({
+      step,
+      setStep,
+      resetAll,
+      handleItemSelected,
+      validateIsActive,
+      validateIsActiveMusic,
+      setEventID,
+      setOldType,
+      setMembersSelected,
+      handleMusicSelected,
+      handleMenuMusic,
+      dataList: filteredDataList,
+      eventID,
+      setSongsSelected,
+      onSubmit: handleCreateEvent,
+      isLoading: isPending,
+      dataForm,
+      setDataForm,
+      searchTerm,
+      setSearchTerm,
+      visibleMenuMusic,
+      setVisibleMenuMusic,
+      songPressed,
+      setSongPressed,
+    }),
+    [
+      step,
+      setStep,
+      resetAll,
+      handleItemSelected,
+      validateIsActive,
+      validateIsActiveMusic,
+      setEventID,
+      setOldType,
+      setMembersSelected,
+      handleMusicSelected,
+      handleMenuMusic,
+      filteredDataList,
+      eventID,
+      setSongsSelected,
+      handleCreateEvent,
+      isPending,
+      dataForm,
+      setDataForm,
+      searchTerm,
+      setSearchTerm,
+      visibleMenuMusic,
+      setVisibleMenuMusic,
+      songPressed,
+      setSongPressed,
+    ]
+  );
 
   return (
     <CreateCallContext.Provider value={contextValue}>

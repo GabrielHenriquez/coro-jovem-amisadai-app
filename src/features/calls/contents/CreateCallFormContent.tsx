@@ -24,7 +24,7 @@ const CreateCallFormContent = ({ eventData }: { eventData: IEvent }) => {
   const formValidator = useFormContext();
   const { errors } = formValidator.formState;
   const { watch, setValue } = formValidator;
-  const { setMembersSelected, setSongsData, setEventID, setOldType } =
+  const { setMembersSelected, setSongsSelected, setEventID, setOldType } =
     useCreateCallContext();
   const callType = watch("callType");
 
@@ -38,7 +38,7 @@ const CreateCallFormContent = ({ eventData }: { eventData: IEvent }) => {
           setValue("namePreacher", eventData?.namePreacher);
           setValue("callType", eventData?.type);
           setMembersSelected(eventData?.components as IMember[]);
-          setSongsData(eventData?.musics);
+          setSongsSelected(eventData?.musics);
           setEventID(eventData?.numberSearchDoc.toString());
           setOldType(eventData?.type);
         }, 350);
