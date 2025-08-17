@@ -1,8 +1,6 @@
-import { version } from "react";
-
 export default {
   expo: {
-    name: "CJA",
+    name: "Coro Jovem Amisadai",
     slug: "coro-jovem-amisadai-app",
     version: "1.0.1",
     orientation: "portrait",
@@ -30,6 +28,9 @@ export default {
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
         "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
       ],
       package: "com.gabrielrick2941.corojovemamisadaiapp",
     },
@@ -50,6 +51,13 @@ export default {
         {
           photosPermission:
             "The app accesses your photos to let you share them with your friends.",
+        },
+      ],
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/notification-icon.png",
+          color: "#4C5E46",
         },
       ],
       "@config-plugins/react-native-blob-util",
