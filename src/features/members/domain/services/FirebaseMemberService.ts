@@ -1,29 +1,21 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  setDoc,
-} from "firebase/firestore";
+import * as DB from "firebase/firestore";
 import { db, storage } from "global/configs/firebase";
 import { IMember } from "../entities/Member";
 import { FormDataRegisterMember } from "@features/members/hooks/forms/useFormRegisterMember";
-import { deleteObject, ref } from "firebase/storage";
-import { DB_COLLECTIONS } from "@utils/DB_collections";
+import * as Storage from "firebase/storage";
+import { DB_COLLECTIONS } from "global/constants/DB_COLLECTIONS";
 
 export const FirebaseMemberService = {
   createMember: async (memberData: FormDataRegisterMember): Promise<void> => {
-    const collectionRef = collection(db, DB_COLLECTIONS.components);
-    await addDoc(collectionRef, memberData);
+    const collectionRef = DB.collection(db, DB_COLLECTIONS.components);
+    await DB.addDoc(collectionRef, memberData);
   },
 
-  updateMember: async (memberData: FormDataRegisterMember): Promise<void> => {
-    await setDoc(
-      doc(db, DB_COLLECTIONS.components, memberData?.id),
+  updateMember: async (
+    memberData: FormDataRegisterMember & { id: string }
+  ): Promise<void> => {
+    await DB.setDoc(
+      DB.doc(db, DB_COLLECTIONS.components, memberData.id),
       memberData
     );
   },
@@ -34,20 +26,20 @@ export const FirebaseMemberService = {
     memberCard: string;
     profileImageUri: string;
   }): Promise<void> => {
-    const docRef = doc(db, DB_COLLECTIONS.components, member?.id);
-    const imageRef = ref(
+    const docRef = DB.doc(db, DB_COLLECTIONS.components, member?.id);
+    const imageRef = Storage.ref(
       storage,
       `component-${member?.name}-${member?.memberCard}/profileImage`
     );
-    await deleteDoc(docRef);
-    if (member?.profileImageUri) await deleteObject(imageRef);
+    await DB.deleteDoc(docRef);
+    if (member?.profileImageUri) await Storage.deleteObject(imageRef);
   },
 
   getMembers: async (): Promise<IMember[]> => {
-    const collectionRef = collection(db, DB_COLLECTIONS.components);
-    const q = query(collectionRef, orderBy("name"));
+    const collectionRef = DB.collection(db, DB_COLLECTIONS.components);
+    const q = DB.query(collectionRef, DB.orderBy("name"));
 
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await DB.getDocs(q);
 
     if (!querySnapshot.empty) {
       const documentsData: IMember[] = querySnapshot.docs.map((doc) => {
@@ -61,8 +53,8 @@ export const FirebaseMemberService = {
     return [];
   },
   getMember: async (uid: string): Promise<IMember | {}> => {
-    const docRef = doc(db, DB_COLLECTIONS.components, uid);
-    const docSnap = await getDoc(docRef);
+    const docRef = DB.doc(db, DB_COLLECTIONS.components, uid);
+    const docSnap = await DB.getDoc(docRef);
     if (docSnap.exists())
       return { ...docSnap.data(), id: docSnap?.id } as IMember;
     return {};
