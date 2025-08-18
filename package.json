@@ -6,7 +6,10 @@
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@config-plugins/react-native-blob-util": "^11.0.0",
@@ -24,14 +27,13 @@
     "@tanstack/react-query": "^5.81.5",
     "axios": "^1.10.0",
     "cpf-cnpj-validator": "^1.0.3",
-    "date-fns": "^4.1.0",
     "expo": "53.0.20",
     "expo-constants": "~17.1.7",
     "expo-device": "~7.1.4",
-    "expo-file-system": "~18.1.11",
     "expo-image-picker": "^16.1.4",
     "expo-linear-gradient": "~14.1.5",
     "expo-navigation-bar": "^4.2.7",
+    "expo-notifications": "^0.31.4",
     "expo-print": "~14.1.4",
     "expo-secure-store": "^14.2.3",
     "expo-sharing": "^13.1.5",
@@ -66,9 +68,17 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/plugin-transform-template-literals": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.2.2",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.0.10",
     "babel-plugin-module-resolver": "^5.0.2",
+    "jest": "^30.0.5",
     "react-native-svg-transformer": "^1.5.1",
+    "react-test-renderer": "^19.1.1",
+    "ts-jest": "^29.4.1",
     "typescript": "~5.8.3"
   },
   "private": true
