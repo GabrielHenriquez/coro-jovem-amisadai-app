@@ -6,7 +6,7 @@ import CreateCallSPAScreen from "../screens/CreateCallSPAScreen";
 import { IEvent } from "../domain/entities/Events";
 
 export type CallStackParamList = {
-  CreateCall: { event?: IEvent } | undefined;
+  CreateCall: { event?: IEvent };
 };
 
 export type CallNavigationProp = NativeStackNavigationProp<CallStackParamList>;
