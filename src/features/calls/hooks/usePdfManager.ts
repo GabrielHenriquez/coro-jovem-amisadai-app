@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import * as Print from "expo-print";
 import * as Share from "expo-sharing";
-import { htmlContent } from "../utils";
+import htmlContent from "../utils/htmlContent";
+import { Log } from "@services/Logger";
 
 interface UsePdfManagerProps {
   event: any;
@@ -22,7 +23,7 @@ export const usePdfManager = ({ event, validate }: UsePdfManagerProps) => {
       });
       setPdfUri(uri);
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      Log.error("Error generating PDF:", error);
     } finally {
       setTimeout(() => setLoadingEventPreview(false), 300);
     }
@@ -34,7 +35,7 @@ export const usePdfManager = ({ event, validate }: UsePdfManagerProps) => {
     try {
       await Share.shareAsync(pdfUri);
     } catch (error) {
-      console.error("Error sharing PDF:", error);
+      Log.error("Error sharing PDF:", error);
     }
   }, [pdfUri]);
 
@@ -42,9 +43,7 @@ export const usePdfManager = ({ event, validate }: UsePdfManagerProps) => {
     if (pdfUri) validate();
   }, [pdfUri, validate]);
 
-  const clearPdfUri = useCallback(() => {
-    setPdfUri(null);
-  }, []);
+  const clearPdfUri = useCallback(() => setPdfUri(null), []);
 
   return {
     pdfUri,

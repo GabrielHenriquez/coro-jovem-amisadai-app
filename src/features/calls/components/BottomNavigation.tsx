@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "@styles/colors";
 import { View } from "react-native";
 import { useCreateCallContext } from "../contexts/CreateCallContext";
+import { Log } from "@services/Logger";
 
 const BottomNavigation = () => {
   const formValidator = useFormContext();
@@ -22,7 +23,7 @@ const BottomNavigation = () => {
       }
     },
     (errors) => {
-      console.log("❌ Erros de validação:", errors);
+      Log.error("Erros de validação:", errors);
     }
   );
 

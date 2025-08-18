@@ -4,17 +4,21 @@ import { MembersUseCase } from "../domain/usecases/MembersUseCase";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IMember } from "../domain/entities/Member";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useMemberStore } from "../stores/membersStore";
+import { useToastMemberStore } from "../stores/toastMemberStore";
 import { Keyboard } from "react-native";
+import { Log } from "@services/Logger";
+import { useBirthdayNotifications } from "@hooks/index";
 
 const membersRepo = new FirebaseMembersRepository();
 const membersUseCase = new MembersUseCase(membersRepo);
 
 const useMembers = () => {
   const [memberSelected, setMemberSelected] = useState<IMember | null>(null);
-  const { setVisibleToast } = useMemberStore();
+  const { setVisibleToast } = useToastMemberStore();
   const queryClient = useQueryClient();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const { scheduleAllNotifications } = useBirthdayNotifications();
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -23,14 +27,13 @@ const useMembers = () => {
     queryKey: ["members"],
     queryFn: async () => {
       const members = (await membersUseCase.execute("getMembers")) as IMember[];
-      console.log("✅ Membros obtidos com sucesso:", members.length);
       return members;
     },
   });
 
   const handleGetMember = async (id: string) => {
     const member = (await membersUseCase.execute("getMember", id)) as IMember;
-    console.log("✅ Membro mostrado com sucesso:", member?.name);
+    Log.success("Membro mostrado com sucesso:", member?.name);
     setMemberSelected(member);
   };
 
@@ -52,6 +55,30 @@ const useMembers = () => {
     });
     setVisibleToast(true, "delete");
   };
+
+  useEffect(() => {
+    if (
+      queryGetMembers.isSuccess &&
+      queryGetMembers.data &&
+      queryGetMembers.data.length > 0
+    ) {
+      Log.loading(
+        `Membros carregados (${queryGetMembers.data.length}) - verificando notificações...`
+      );
+
+      scheduleAllNotifications(
+        queryGetMembers.data.map((member) => ({
+          id: member.id || "",
+          name: member.name,
+          birthDate: member.birthDate,
+        }))
+      );
+    }
+  }, [
+    queryGetMembers.isSuccess,
+    queryGetMembers.data,
+    scheduleAllNotifications,
+  ]);
 
   useEffect(() => {
     if (memberSelected) {

@@ -2,23 +2,26 @@ import { FormDataRegisterMember } from "@features/members/hooks/forms/useFormReg
 import { IMember } from "../entities/Member";
 import { FirebaseMemberService } from "../services/FirebaseMemberService";
 import { MembersRepository } from "./MembersRepository";
+import { Log } from "@services/Logger";
 
 export class FirebaseMembersRepository implements MembersRepository {
   async createMember(memberData: FormDataRegisterMember): Promise<void> {
     try {
       await FirebaseMemberService.createMember(memberData);
     } catch (error) {
-      console.error("❌ Erro ao criar componente:", error);
-      throw new Error("❌ Erro ao criar componente:");
+      Log.error("Erro ao criar componente:", error);
+      throw new Error("Erro ao criar componente:");
     }
   }
 
-  async updateMember(memberData: FormDataRegisterMember): Promise<void> {
+  async updateMember(
+    memberData: FormDataRegisterMember & { id: string }
+  ): Promise<void> {
     try {
       await FirebaseMemberService.updateMember(memberData);
     } catch (error) {
-      console.error("❌ Erro ao atualizar componente:", error);
-      throw new Error("❌ Erro ao atualizar componente:");
+      Log.error("Erro ao atualizar componente:", error);
+      throw new Error("Erro ao atualizar componente:");
     }
   }
 
@@ -31,8 +34,8 @@ export class FirebaseMembersRepository implements MembersRepository {
     try {
       await FirebaseMemberService.deleteMember(member);
     } catch (error) {
-      console.error("❌ Erro ao deletar componente:", error);
-      throw new Error("❌ Erro ao deletar componente:");
+      Log.error("Erro ao deletar componente:", error);
+      throw new Error("Erro ao deletar componente:");
     }
   }
 
@@ -43,10 +46,10 @@ export class FirebaseMembersRepository implements MembersRepository {
       if (!member || typeof member !== "object") {
         throw new Error(`Usuário com id ${id} não encontrado.`);
       }
-      return member;
+      return member as IMember;
     } catch (error) {
-      console.error("❌ Erro ao obter componente:", error);
-      throw new Error("❌ Erro ao obter componente");
+      Log.error("Erro ao obter componente:", error);
+      throw new Error("Erro ao obter componente");
     }
   }
 
@@ -55,8 +58,8 @@ export class FirebaseMembersRepository implements MembersRepository {
       const members = await FirebaseMemberService.getMembers();
       return members;
     } catch (error) {
-      console.error("❌ Erro ao obter componentes:", error);
-      throw new Error("❌ Erro ao obter componentes");
+      Log.error("Erro ao obter componentes:", error);
+      throw new Error("Erro ao obter componentes");
     }
   }
 }

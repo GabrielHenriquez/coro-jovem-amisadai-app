@@ -1,3 +1,4 @@
+import { Log } from "@services/Logger";
 import axios from "axios";
 
 const API = axios.create({
@@ -6,16 +7,14 @@ const API = axios.create({
 });
 
 API.interceptors.request.use(async (config) => {
-  console.log(
-    `🚀 [API] REQUEST EM: ${config.method?.toUpperCase()} ${config.url}`
-  );
+  Log.info(`[API] REQUEST EM: ${config.method?.toUpperCase()} ${config.url}`);
   return config;
 });
 
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log("❌ [API ERROR]:", error);
+    Log.error("[API ERROR]:", error);
     return Promise.reject(error);
   }
 );
