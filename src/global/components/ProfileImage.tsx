@@ -1,5 +1,5 @@
 import { colors } from "@styles/colors";
-import { Image, View } from "react-native";
+import { View } from "react-native";
 import { getInitials } from "@utils/strings";
 import Text from "./Text";
 import FastImage from "react-native-fast-image";

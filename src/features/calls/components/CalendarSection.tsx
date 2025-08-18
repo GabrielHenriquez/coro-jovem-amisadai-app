@@ -6,7 +6,6 @@ import { DateData, DayState } from "react-native-calendars/src/types";
 import CalendarDay from "./CalendarDay";
 import styles from "../styles/CallsStyles";
 
-// Type definitions
 interface CalendarMonth {
   month: number;
   year: number;
@@ -121,7 +120,6 @@ const CalendarSection: React.FC<CalendarSectionProps> = ({
       >
         <RNC.CalendarProvider date={selectedDate}>
           <RN.View style={styles.calendarWrapper}>
-            {/* ExpandableCalendar */}
             <RN.View
               style={[
                 styles.calendarOverlay,
@@ -151,7 +149,6 @@ const CalendarSection: React.FC<CalendarSectionProps> = ({
               />
             </RN.View>
 
-            {/* Calendar */}
             <RN.View
               style={[
                 styles.calendarOverlay,

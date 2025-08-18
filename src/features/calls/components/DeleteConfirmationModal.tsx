@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Modal, Text } from "@components/index";
-import getHeight from "@utils/getHeight";
+import getHeight from "global/constants/height";
 
 interface DeleteConfirmationModalProps {
   visible: boolean;

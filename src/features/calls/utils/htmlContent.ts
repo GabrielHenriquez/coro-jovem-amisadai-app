@@ -1,4 +1,4 @@
-import { formatDateToBR } from "@features/members/utils/formatDate";
+import { formatDateToBR } from "@utils/date";
 import { IEvent } from "../domain/entities/Events";
 
 const htmlContent = (event: IEvent) => {

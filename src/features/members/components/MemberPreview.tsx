@@ -3,7 +3,7 @@ import { colors } from "@styles/colors";
 import * as RN from "react-native";
 import * as Component from "@components/index";
 import { Mic2, Pen, Trash2 } from "lucide-react-native";
-import getHeight from "@utils/getHeight";
+import getHeight from "global/constants/height";
 import { IMember } from "../domain/entities/Member";
 import { calcularIdade } from "../utils/calculateAge";
 import { useNavigation } from "@react-navigation/native";

@@ -3,7 +3,7 @@ import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 import { colors } from "@styles/colors";
 import * as RN from "react-native";
 import Text from "@components/Text";
-import height from "@utils/getHeight";
+import height from "global/constants/height";
 
 interface InputContentProps extends RN.ViewProps {
   children: ReactNode;

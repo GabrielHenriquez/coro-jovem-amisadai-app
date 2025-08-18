@@ -3,12 +3,11 @@ import { useState, useRef, ReactNode } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@styles/colors";
 import { getHeight, responsiveSize } from "@utils/index";
-import { CallValue } from "@features/calls/contents/CreateCallFormContent";
 import {
   BaptizedValue,
   GenderValue,
   VoiceValue,
-} from "@features/members/screens/RegisterMemberScreen";
+} from "@features/members/domain/entities/MemberForm";
 import * as RN from "react-native";
 import {
   Control,
@@ -17,7 +16,8 @@ import {
   Merge,
   useController,
 } from "react-hook-form";
-import { OfficeValue } from "@features/auth/presentation/contents/RegisterContent";
+import { CallValue } from "@features/calls/components/CreateCallFormContent";
+import { OfficeValue } from "@features/auth/components/RegisterContent";
 
 export interface IDropdownValues {
   gender?: GenderValue | null;
@@ -25,6 +25,7 @@ export interface IDropdownValues {
   baptized?: BaptizedValue | null;
   callType?: CallValue | null;
   office?: OfficeValue | null;
+  month?: string | null;
 }
 
 interface IProps<T extends keyof IDropdownValues> {
@@ -143,7 +144,7 @@ export default function AnimatedDropdown<T extends keyof IDropdownValues>({
       >
         <RN.FlatList
           data={data}
-          scrollEnabled={false}
+          scrollEnabled={data.length > 4}
           keyExtractor={(item) => String(item)}
           renderItem={({ item, index }) => {
             const isSelected = item === field.value;

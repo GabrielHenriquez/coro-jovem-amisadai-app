@@ -1,4 +1,3 @@
-import { ICredentialsRegister } from "@models/auth";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,

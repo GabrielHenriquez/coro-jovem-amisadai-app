@@ -2,7 +2,7 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
 } from "@react-navigation/native-stack";
-import AuthSPAScreen from "../presentation/screens/AuthSPAScreen";
+import AuthSPAScreen from "../screens/AuthSPAScreen";
 
 export type AuthStackParamList = {
   AuthSPA: undefined;
