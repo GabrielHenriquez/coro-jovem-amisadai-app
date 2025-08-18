@@ -2,17 +2,21 @@ import { useState } from "react";
 import { Modal, Button, Text } from "@components/index";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { colors } from "@styles/colors";
-import { LogOut } from "lucide-react-native";
+import { LogOut, FileText } from "lucide-react-native";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { useAuthStore } from "@features/auth/presentation/stores/authStore";
-import * as RN from "react-native";
+import { useAuthStore } from "@features/auth/stores/authStore";
 import ProfileImage from "@components/ProfileImage";
+import * as RN from "react-native";
 
 export default function CustomDrawerContent(
   props: DrawerContentComponentProps
 ) {
   const [showModal, setShowModal] = useState(false);
   const { user, logout } = useAuthStore();
+
+  const handleReportsPress = () => {
+    props.navigation.navigate("Reports" as never);
+  };
 
   return (
     <DrawerContentScrollView
@@ -36,17 +40,31 @@ export default function CustomDrawerContent(
           </RN.View>
         </RN.View>
 
-        <Button
-          bgColor="redDark"
-          styleRest={{ height: 38, marginTop: 20 }}
-          onPress={() => setShowModal(true)}
-        >
-          <Text size={16} className="text-white font-poppinsSemiBold">
-            Sair
-          </Text>
+        <RN.View style={{ gap: 15, marginTop: 20 }}>
+          <Button
+            bgColor="primary"
+            styleRest={{ height: 38 }}
+            onPress={handleReportsPress}
+          >
+            <Text size={16} className="text-white font-poppinsSemiBold">
+              Relatórios
+            </Text>
 
-          <LogOut size={20} color={colors.white} />
-        </Button>
+            <FileText size={20} color={colors.white} />
+          </Button>
+
+          <Button
+            bgColor="redDark"
+            styleRest={{ height: 38 }}
+            onPress={() => setShowModal(true)}
+          >
+            <Text size={16} className="text-white font-poppinsSemiBold">
+              Sair
+            </Text>
+
+            <LogOut size={20} color={colors.white} />
+          </Button>
+        </RN.View>
       </RN.View>
 
       <Modal.Root>
