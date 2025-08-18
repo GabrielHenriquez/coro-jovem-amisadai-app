@@ -87,7 +87,7 @@ export const MainTabs = () => {
             if (screenFocused === "Calls")
               navigation.navigate("CallsNavigation", {
                 screen: "CreateCall",
-                params: undefined,
+                params: { event: undefined },
               });
 
             if (screenFocused === "Members")
