@@ -6,3 +6,6 @@ export { default as MembersHeader } from "./MembersHeader";
 export { default as MembersList } from "./MembersList";
 export { default as MembersListShimmer } from "./MembersListShimmer";
 export { default as DeleteConfirmationModal } from "./DeleteConfirmationModal";
+export { ProfileImageSection } from "./ProfileImageSection";
+export { PersonalInfoSection } from "./PersonalInfoSection";
+export { AddressSection } from "./AddressSection";

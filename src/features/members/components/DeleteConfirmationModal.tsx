@@ -1,4 +1,3 @@
-import * as RN from "react-native";
 import * as Component from "@components/index";
 import { IMember } from "../domain/entities/Member";
 import { getHeight } from "@utils/index";
@@ -17,9 +16,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
   onConfirm,
 }) => {
   const handleConfirm = () => {
-    if (memberToDelete) {
-      onConfirm(memberToDelete);
-    }
+    if (memberToDelete) onConfirm(memberToDelete);
   };
 
   return (

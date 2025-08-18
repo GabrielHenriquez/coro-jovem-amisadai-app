@@ -34,7 +34,9 @@ const MemberCard: React.FC<MemberCardProps> = memo(({ onPress, member }) => {
           borderRadius: 30,
           width: 14,
           backgroundColor:
-            member?.gender === "Masculino" ? colors.blue : "#bd236b",
+            member?.gender === "Masculino"
+              ? colors.blueGender
+              : colors.pinkGender,
         }}
         className="h-11"
       />
