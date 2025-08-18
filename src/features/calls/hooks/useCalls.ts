@@ -1,21 +1,24 @@
-import { useCallback, useMemo, useRef, useState } from "react";
-import { useEventsQueries } from "../infra/queryAdapters/useEventsQueries";
+import { useCallback, useMemo, useRef, useState, useTransition } from "react";
+import { useEventsQueries } from "./useEventsQueries";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { IEvent } from "../domain/entities/Events";
-import { useQueryClient } from "@tanstack/react-query";
 import { useToastStore } from "../stores/useToastStore";
+import { getTodayLocalDate } from "@utils/date";
+import { colors } from "@styles/colors";
+import { Log } from "@services/Logger";
 
-export const useCalls = () => {
-  const formatoAmericano = new Date().toISOString().split("T")[0];
-  const queryClient = useQueryClient();
+export const useCalls = (currentMonth?: string) => {
+  const todayLocalDate = getTodayLocalDate();
   const [opennedCalendar, setOpennedCalendar] = useState(false);
   const { setMessage } = useToastStore();
   const [selectedDate, setSelectedDate] = useState<string | undefined>(
-    formatoAmericano
+    todayLocalDate
   );
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const callPreviewModalRef = useRef<BottomSheetModal>(null);
   const [visibleModalDelete, setVisibleModalDelete] = useState(false);
+
+  const [isPending, startTransition] = useTransition();
 
   const {
     getDotsQuery,
@@ -25,12 +28,20 @@ export const useCalls = () => {
     deleteEventMutation,
   } = useEventsQueries();
 
-  // Memoized calendar toggle to prevent unnecessary re-renders
+  const colorMap = useMemo(
+    () => ({
+      Saída: colors.redEvent,
+      Escala: colors.blueEvent,
+      Local: colors.blueEvent,
+      aniversariante: colors.birthDayEvent,
+    }),
+    []
+  );
+
   const toggleCalendar = useCallback(() => {
     setOpennedCalendar((prev) => !prev);
   }, []);
 
-  // Memoized modal action handler
   const handleModalAction = useCallback(
     (ref: React.RefObject<any>, action: "present" | "close") => {
       if (!ref.current) return;
@@ -40,43 +51,130 @@ export const useCalls = () => {
     []
   );
 
-  // Memoized event getter
   const handleGetEvent = useCallback(
     (eventId: string) => {
       getEventByIdMutation.mutate(eventId, {
         onSuccess: () => {
-          handleModalAction(bottomSheetModalRef, "present");
+          handleModalAction(bottomSheetRef, "present");
         },
       });
     },
     [getEventByIdMutation, handleModalAction]
   );
 
-  // Memoized validation function
   const validate = useCallback(() => {
-    handleModalAction(bottomSheetModalRef, "close");
+    handleModalAction(bottomSheetRef, "close");
     setTimeout(() => handleModalAction(callPreviewModalRef, "present"), 500);
   }, [handleModalAction]);
 
-  // Memoized dots data with proper dependency
+  const getDotColor = useCallback(
+    (key: string): string => {
+      const colorMapObj = new Map(Object.entries(colorMap));
+
+      for (const [pattern, color] of colorMapObj) {
+        if (key.includes(pattern)) return color;
+      }
+      return "";
+    },
+    [colorMap]
+  );
+
   const dots = useMemo(() => {
     if (!getDotsQuery.data) return {};
-    return Object.assign({}, ...getDotsQuery.data);
-  }, [getDotsQuery.data]);
 
-  // Memoized filtered events with proper dependency
+    const dotsData = Object.assign({}, ...getDotsQuery.data);
+    const dotsWithColors: {
+      [date: string]: { dots: { key: string; color: string }[] };
+    } = {};
+
+    Object.keys(dotsData).forEach((date) => {
+      const dateData = dotsData[date];
+      if (dateData?.dots) {
+        dotsWithColors[date] = {
+          ...dateData,
+          dots: dateData.dots.map((dot: { key: string }) => ({
+            ...dot,
+            color: getDotColor(dot.key),
+          })),
+        };
+      }
+    });
+
+    return dotsWithColors;
+  }, [getDotsQuery.data, getDotColor]);
+
   const events = useMemo(() => {
     if (!selectedDate || !getEventsQuery.data) return [];
+
+    if (getEventsQuery.data.length > 100) {
+      const eventsSet = new Set(getEventsQuery.data.map((e) => e.date));
+      if (!eventsSet.has(selectedDate)) return [];
+    }
+
     return getEventsQuery.data.filter((event) => event.date === selectedDate);
   }, [selectedDate, getEventsQuery.data]);
 
-  // Memoized filtered birth dates with proper dependency
+  const eventsByMonth = useMemo(() => {
+    if (!getEventsQuery.data || !currentMonth) return [];
+
+    const monthYear = currentMonth.split(" ");
+    if (monthYear.length !== 2) {
+      return [];
+    }
+
+    const month = monthYear[0];
+    const year = monthYear[1];
+
+    const monthMap: { [key: string]: string } = {
+      Janeiro: "01",
+      Fevereiro: "02",
+      Março: "03",
+      Abril: "04",
+      Maio: "05",
+      Junho: "06",
+      Julho: "07",
+      Agosto: "08",
+      Setembro: "09",
+      Outubro: "10",
+      Novembro: "11",
+      Dezembro: "12",
+    };
+
+    const monthNumber = monthMap[month];
+    if (!monthNumber) return [];
+
+    const eventIds = getEventsQuery.data
+      .filter((event) => {
+        if (!event || !event.date) return false;
+
+        try {
+          const [eventYear, eventMonth] = event.date.split("-");
+          const matches = eventYear === year && eventMonth === monthNumber;
+
+          return matches;
+        } catch (error) {
+          return false;
+        }
+      })
+      .map((event) => event?.id)
+      .filter(Boolean) as string[];
+
+    return eventIds;
+  }, [getEventsQuery.data, currentMonth]);
+
   const eventsBirthDate = useMemo(() => {
     if (!selectedDate || !getBirthDatesQuery.data) return [];
+
+    if (getBirthDatesQuery.data.length > 100) {
+      const birthDatesSet = new Set(
+        getBirthDatesQuery.data.map((e) => e.birthDate)
+      );
+      if (!birthDatesSet.has(selectedDate)) return [];
+    }
+
     return getBirthDatesQuery.data.filter((e) => e.birthDate === selectedDate);
   }, [selectedDate, getBirthDatesQuery.data]);
 
-  // Memoized date change handler
   const getEventsByDateToCard = useCallback(
     (date: string) => {
       if (opennedCalendar) setOpennedCalendar(false);
@@ -85,15 +183,23 @@ export const useCalls = () => {
     [opennedCalendar]
   );
 
-  // Memoized delete event handler
   const handleDeleteEvent = useCallback(
     (event: IEvent) => {
       deleteEventMutation.mutate(event, {
         onSuccess: async () => {
           setVisibleModalDelete(false);
-          handleModalAction(bottomSheetModalRef, "close");
-          await Promise.all([getDotsQuery.refetch(), getEventsQuery.refetch()]);
-          setMessage("Chamada excluída com sucesso!");
+          handleModalAction(bottomSheetRef, "close");
+
+          startTransition(async () => {
+            await Promise.all([
+              getDotsQuery.refetch(),
+              getEventsQuery.refetch(),
+            ]);
+            setMessage("Chamada excluída com sucesso!");
+          });
+        },
+        onError: (error) => {
+          Log.error(`Erro ao excluir chamada! ${error}`);
         },
       });
     },
@@ -106,7 +212,6 @@ export const useCalls = () => {
     ]
   );
 
-  // Memoized loading state to prevent unnecessary re-renders
   const loadingData = useMemo(
     () =>
       getDotsQuery.isLoading ||
@@ -119,47 +224,40 @@ export const useCalls = () => {
     ]
   );
 
-  // Memoized loading event state
   const loadingEvent = useMemo(
     () => getEventByIdMutation?.isPending,
     [getEventByIdMutation?.isPending]
   );
 
-  // Memoized delete loading state
   const isLoadingDelete = useMemo(
     () => deleteEventMutation?.isPending,
     [deleteEventMutation?.isPending]
   );
 
   return {
-    // Calendar state
     opennedCalendar,
     toggleCalendar,
     selectedDate,
 
-    // Modal refs
-    bottomSheetModalRef,
+    bottomSheetRef,
     callPreviewModalRef,
 
-    // Event data
     events,
+    eventsByMonth,
     eventsBirthDate,
     event: getEventByIdMutation?.data,
     dots,
 
-    // Loading states
     loadingData,
     loadingEvent,
     isLoadingDelete,
+    isPending,
 
-    // Query objects for direct access
     getBirthDatesQuery,
 
-    // Modal state
     visibleModalDelete,
     setVisibleModalDelete,
 
-    // Event handlers
     handleModalAction,
     handleGetEvent,
     validate,
