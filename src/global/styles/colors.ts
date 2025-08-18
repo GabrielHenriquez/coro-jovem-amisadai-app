@@ -30,6 +30,7 @@ export const colors = {
   redDark: "#D21D1D",
   redEvent: "#BD2D2D",
   blueEvent: "#32C0CA",
+  birthDayEvent: "#B8BD2D",
   redLight: "#FFC4C4",
   pinkGender: "#C54186",
   blueGender: "#4167C5",
