@@ -1,9 +1,10 @@
+import { useRoute, RouteProp } from "@react-navigation/native";
 import { CreateCallProvider } from "../contexts/CreateCallContext";
-import CreateCallScreenContent from "../contents/CreateCallScreenContent";
-import { useRoute } from "@react-navigation/native";
+import { CallStackParamList } from "../navigation/CallsStack";
+import CreateCallScreenContent from "../components/CreateCallScreenContent";
 
 const CreateCallSPAScreen = () => {
-  const route = useRoute();
+  const route = useRoute<RouteProp<CallStackParamList, "CreateCall">>();
   const event = route?.params?.event;
 
   return (

@@ -1,82 +1,44 @@
 import React, { useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { HeaderWithMenu } from "@components/index";
-import styles from "../styles/CallsStyles";
+import { useToastStore } from "../stores/useToastStore";
 import * as RN from "react-native";
 import * as RNC from "react-native-calendars";
-import {
-  useCalls,
-  useMonthFormatting,
-  usePdfManager,
-  useEventActions,
-  useDateFormatter,
-} from "../hooks";
+import * as Hooks from "../hooks";
+import * as Components from "../components";
 import Toast from "@components/Toast/view";
-import {
-  CalendarSection,
-  EventsList,
-  BirthDatesList,
-  EventMenu,
-  PdfPreviewModal,
-  DeleteConfirmationModal,
-} from "../components";
-import { useToastStore } from "../stores/useToastStore";
 
-RNC.LocaleConfig.locales["pt-br"] = require("../utils/localeConfig").default;
+import { Text } from "@components/index";
+import styles from "../styles/CallsStyles";
+
+RNC.LocaleConfig.locales["pt-br"] = require("../constants/localeConfig").default;
 RNC.LocaleConfig.defaultLocale = "pt-br";
 
 export default function CallScreen() {
   const { message, visible, onHide } = useToastStore();
-
-  const {
-    eventsBirthDate,
-    dots,
-    event,
-    handleModalAction,
-    getEventsByDateToCard,
-    events,
-    opennedCalendar,
-    toggleCalendar,
-    bottomSheetModalRef,
-    callPreviewModalRef,
-    validate,
-    handleDeleteEvent,
-    isLoadingDelete,
-    visibleModalDelete,
-    setVisibleModalDelete,
-    handleGetEvent,
-    selectedDate,
-    loadingData,
-    getBirthDatesQuery,
-  } = useCalls();
-
-  // Use the optimized month formatting hook
   const { currentMonth, currentMonthFormatted, handleMonthChange } =
-    useMonthFormatting();
+    Hooks.useMonthFormatting();
+  const ViewModel = Hooks.useCalls(currentMonth);
+  const { currentDateDisplay } = Hooks.useDateFormatter(ViewModel.selectedDate);
 
-  // Use the PDF manager hook
   const { pdfUri, loadingEventPreview, generatePDF, sharePDF, clearPdfUri } =
-    usePdfManager({
-      event,
-      validate,
+    Hooks.usePdfManager({
+      event: ViewModel.event,
+      validate: ViewModel.validate,
     });
 
-  // Use the event actions hook
   const { handleEditCall, handleDeleteCall, handleOpenModalDelete } =
-    useEventActions({
-      event,
-      handleModalAction,
-      bottomSheetModalRef,
-      handleDeleteEvent,
-      setVisibleModalDelete,
+    Hooks.useEventActions({
+      event: ViewModel.event,
+      handleModalAction: ViewModel.handleModalAction,
+      bottomSheetModalRef: ViewModel.bottomSheetRef,
+      handleDeleteEvent: ViewModel.handleDeleteEvent,
+      setVisibleModalDelete: ViewModel.setVisibleModalDelete,
     });
-
-  // Use the date formatter hook
-  const { currentDateDisplay } = useDateFormatter(selectedDate);
 
   const calendarHeight = useMemo(
-    () => (opennedCalendar ? 370 : 155),
-    [opennedCalendar]
+    () => (ViewModel.opennedCalendar ? 370 : 155),
+    [ViewModel.opennedCalendar]
   );
 
   return (
@@ -85,59 +47,67 @@ export default function CallScreen() {
 
       <RN.View style={styles.header}>
         <HeaderWithMenu />
-        <CalendarSection
+        <Components.CalendarSection
           handleMonthChange={handleMonthChange}
-          opennedCalendar={opennedCalendar}
+          opennedCalendar={ViewModel.opennedCalendar}
           calendarHeight={calendarHeight}
-          selectedDate={selectedDate!}
-          dots={dots}
-          getEventsByDateToCard={getEventsByDateToCard}
-          toggleCalendar={toggleCalendar}
+          selectedDate={ViewModel.selectedDate!}
+          dots={ViewModel.dots}
+          getEventsByDateToCard={ViewModel.getEventsByDateToCard}
+          toggleCalendar={ViewModel.toggleCalendar}
           currentMonthFormatted={currentMonthFormatted}
           currentMonth={currentMonth}
         />
       </RN.View>
 
       <RN.View
-        style={{ paddingHorizontal: 16, marginTop: 14, marginBottom: 6 }}
+        style={{ paddingHorizontal: 16, marginTop: 20, marginBottom: 6 }}
       >
-        <RN.View className="gap-3 mt-2">
-          <EventsList
-            loadingData={loadingData}
-            events={events}
-            currentDateDisplay={currentDateDisplay}
-            handleGetEvent={handleGetEvent}
+        {(ViewModel.events.length > 0 ||
+          ViewModel.eventsBirthDate.length > 0) && (
+          <Text size={20} className="font-poppinsSemiBold text-black">
+            {currentDateDisplay}
+          </Text>
+        )}
+
+        <RN.View className="mt-4 gap-3">
+          <Components.BirthDatesList
+            getBirthDatesQuery={ViewModel.getBirthDatesQuery}
+            eventsBirthDate={ViewModel.eventsBirthDate}
           />
 
-          <BirthDatesList
-            getBirthDatesQuery={getBirthDatesQuery}
-            eventsBirthDate={eventsBirthDate}
+          <Components.EventsList
+            loadingData={ViewModel.loadingData}
+            events={ViewModel.events}
+            currentDateDisplay={currentDateDisplay}
+            hasBirthDates={ViewModel.eventsBirthDate.length > 0}
+            handleGetEvent={ViewModel.handleGetEvent}
           />
         </RN.View>
       </RN.View>
 
-      <EventMenu
-        bottomSheetModalRef={bottomSheetModalRef}
-        event={event}
+      <Components.EventMenu
+        bottomSheetModalRef={ViewModel.bottomSheetRef}
+        event={ViewModel.event}
         loadingEventPreview={loadingEventPreview}
         generatePDF={generatePDF}
         handleEditCall={handleEditCall}
         handleOpenModalDelete={handleOpenModalDelete}
       />
 
-      <PdfPreviewModal
-        callPreviewModalRef={callPreviewModalRef}
+      <Components.PdfPreviewModal
+        callPreviewModalRef={ViewModel.callPreviewModalRef}
         pdfUri={pdfUri}
-        event={event}
+        event={ViewModel.event}
         onDismiss={clearPdfUri}
         onShare={sharePDF}
       />
 
-      <DeleteConfirmationModal
-        visible={visibleModalDelete}
-        onClose={() => setVisibleModalDelete(false)}
+      <Components.DeleteConfirmationModal
+        visible={ViewModel.visibleModalDelete}
+        onClose={() => ViewModel.setVisibleModalDelete(false)}
         onConfirm={handleDeleteCall}
-        isLoading={isLoadingDelete}
+        isLoading={ViewModel.isLoadingDelete}
       />
 
       <Toast message={message} visible={visible} onHide={onHide} />
