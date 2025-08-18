@@ -1,4 +1,3 @@
-import { ICredentialsRegister } from "@models/auth";
 import { IUser, IUserAuthResponse } from "../entities/User";
 
 export interface AuthRepository {
