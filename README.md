@@ -83,10 +83,6 @@ O **Coro Jovem Amisadai App** é uma aplicação móvel completa que eu desenvol
 ### Instalação
 
 1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/gabrielrick2941/coro-jovem-amisadai-app.git
-   cd coro-jovem-amisadai-app
-   ```
 
 2. **Instale as dependências**
    ```bash
@@ -210,21 +206,9 @@ O projeto utiliza um design system consistente com:
 - **Componentes**: Biblioteca de componentes reutilizáveis
 - **Responsividade**: Adaptação para diferentes tamanhos de tela
 
-## 🤝 Contribuição
-
-Este é um projeto privado desenvolvido para o Coro Jovem Amisadai. Para contribuições ou dúvidas, entre em contato com a equipe de desenvolvimento.
-
-## 📄 Licença
-
-Este projeto é privado e proprietário. Todos os direitos reservados.
-
 ## 👨‍💻 Desenvolvedor
 
-**Gabriel Rick** - [@gabrielrick2941](https://github.com/gabrielrick2941)
-
-## 📞 Suporte
-
-Para suporte técnico ou dúvidas sobre o projeto, entre em contato através dos canais oficiais do Coro Jovem Amisadai.
+**Gabriel Rick** 
 
 ---
 
