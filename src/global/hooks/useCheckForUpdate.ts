@@ -2,6 +2,7 @@ import * as Updates from "expo-updates";
 import * as Device from "expo-device";
 import { Alert } from "react-native";
 import { useEffect } from "react";
+import { Log } from "../services/Logger";
 
 const useCheckForUpdate = () => {
   useEffect(() => {
@@ -22,7 +23,7 @@ const useCheckForUpdate = () => {
           );
         }
       } catch (error) {
-        console.error("Erro ao verificar atualização:", error);
+        Log.error("Erro ao verificar atualização:", error);
       }
     };
 
