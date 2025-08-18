@@ -2,7 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@styles/colors";
 import { useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { useMemberStore } from "../stores/membersStore";
+import { useToastMemberStore } from "../stores/toastMemberStore";
 import { IMember } from "../domain/entities/Member";
 import Toast from "@components/Toast/view";
 import MemberPreview from "../components/MemberPreview";
@@ -17,6 +17,7 @@ import { useMemberSearch } from "../hooks/useMemberSearch";
 import { useDeleteConfirmation } from "../hooks/useDeleteConfirmation";
 
 import MembersHeader from "../components/MembersHeader";
+
 import MembersList from "../components/MembersList";
 import MembersListShimmer from "../components/MembersListShimmer";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
@@ -31,7 +32,8 @@ const Members = () => {
     handleDeleteMember,
   } = useMembers();
 
-  const { getLabelToast, visibleToast, setVisibleToast } = useMemberStore();
+  const { getLabelToast, visibleToast, setVisibleToast } =
+    useToastMemberStore();
 
   const {
     showScrollToTop,
@@ -44,26 +46,19 @@ const Members = () => {
 
   const { fastImageLoaded } = useImagePreload(data as IMember[], isSuccess);
 
-  useFocusEffect(
-    useCallback(() => {
-      resetScrollPosition();
-    }, [])
-  );
-
   const { searchTerm, setSearchTerm, filteredMembers, resetSearch } =
     useMemberSearch(data as IMember[]);
 
   const { hasMemberToDelete, openDeleteConfirmation, closeDeleteConfirmation } =
     useDeleteConfirmation();
 
-  useFocusEffect(
-    useCallback(() => {
-      resetSearch();
-    }, [resetSearch])
-  );
+  useFocusEffect(useCallback(() => resetScrollPosition(), []));
+  useFocusEffect(useCallback(() => resetSearch(), [resetSearch]));
 
   useEffect(() => {
-    if (searchTerm === "" && filteredMembers.length > 0) forceScrollToTop();
+    const hasMembers = filteredMembers.length > 0;
+    const isSearchEmpty = searchTerm === "";
+    if (isSearchEmpty && hasMembers) forceScrollToTop();
   }, [searchTerm, filteredMembers.length, forceScrollToTop]);
 
   const handleDeleteConfirm = useCallback(
