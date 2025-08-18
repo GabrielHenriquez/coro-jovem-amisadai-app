@@ -67,7 +67,7 @@ export const formSchema = yup.object({
   uf: yup.string().optional(),
   city: yup.string().optional(),
   complement: yup.string().optional(),
-});
+}).required();
 
 export type FormDataRegisterMember = yup.InferType<typeof formSchema>;
 
@@ -79,7 +79,7 @@ const useFormRegisterMember = () => {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<FormDataRegisterMember>({
+  } = useForm<any>({
     resolver: yupResolver(formSchema),
   });
 

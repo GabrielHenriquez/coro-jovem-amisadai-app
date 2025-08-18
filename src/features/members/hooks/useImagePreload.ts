@@ -17,10 +17,12 @@ export const useImagePreload = (
         }))
         .filter((img) => !!img.uri);
 
-      if (imageSources.length > 0) {
+      const hasImages = imageSources.length > 0;
+
+      if (hasImages) {
         FastImage.preload(imageSources);
         setFastImageLoaded(true);
-      } else setFastImageLoaded(true);
+      }
     }
   }, [isSuccess, data]);
 

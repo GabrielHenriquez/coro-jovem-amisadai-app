@@ -1,13 +1,15 @@
 import { Keyboard } from "react-native";
 import { FirebaseMembersRepository } from "../domain/repositories/FirebaseMembersRepository";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { FormDataRegisterMember } from "./forms/useFormRegisterMember";
 import { storage } from "global/configs/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
-import { useMemberStore } from "../stores/membersStore";
+import { useToastMemberStore } from "../stores/toastMemberStore";
+import { useBirthdayEvents } from "../../calls/hooks/useBirthdayEvents";
+import { Log } from "global/services/Logger";
 
 type MemberDataWithId = FormDataRegisterMember & {
   id?: string;
@@ -18,77 +20,133 @@ const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
   const repository = new FirebaseMembersRepository();
   const queryClient = useQueryClient();
   const [profileImage, setProfileImage] = useState("");
-  const { setVisibleToast } = useMemberStore();
+  const { setVisibleToast } = useToastMemberStore();
   const { goBack } = useNavigation();
+  const { createOrUpdateBirthdayEvent, cleanup } = useBirthdayEvents();
 
-  const openImagePickerAsync = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      quality: 0.3,
-    });
+  const operationInProgress = useRef(false);
 
-    if (result && !result.canceled && result.assets) {
-      setProfileImage(result.assets[0].uri);
-    }
-  };
-
-  const uploadImageStorage = async (name: string, memberCard: string) => {
-    const response = await fetch(profileImage);
-    const blob = await response.blob();
-    const imageRef = ref(
-      storage,
-      `component-${name}-${memberCard}/profileImage`
-    );
-
+  const openImagePickerAsync = useCallback(async () => {
     try {
-      const uploadTask = await uploadBytes(imageRef, blob);
-      const uri = await getDownloadURL(uploadTask.ref);
-      return uri;
-    } catch (error: any) {
-      console.log("Erro no upload de imagem", error);
-      return "";
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        quality: 0.3,
+      });
+
+      if (result && !result.canceled && result.assets) {
+        setProfileImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      Log.error("Erro ao abrir seletor de imagem:", error);
     }
-  };
+  }, []);
+
+  const uploadImageStorage = useCallback(
+    async (name: string, memberCard: string) => {
+      if (!profileImage) return "";
+
+      try {
+        const response = await fetch(profileImage);
+        const blob = await response.blob();
+        const imageRef = ref(
+          storage,
+          `component-${name}-${memberCard}/profileImage`
+        );
+
+        const uploadTask = await uploadBytes(imageRef, blob);
+        const uri = await getDownloadURL(uploadTask.ref);
+        return uri;
+      } catch (error: any) {
+        Log.error("Erro no upload de imagem", error);
+        return "";
+      }
+    },
+    [profileImage]
+  );
 
   const createMemberMutation = useMutation({
     mutationFn: async (data: FormDataRegisterMember) => {
-      let uri = "";
-      if (profileImage)
-        uri = await uploadImageStorage(data?.name, data?.memberCard);
+      if (operationInProgress.current)
+        throw new Error("Operação já em andamento");
 
-      const memberData: MemberDataWithId = {
-        ...data,
-        profileImageUri: uri,
-      };
+      operationInProgress.current = true;
 
-      if (isEdit) {
-        memberData.id = isEdit;
-        return repository.updateMember(memberData);
-      } else {
-        return repository.createMember(memberData);
+      try {
+        let uri = "";
+        if (profileImage)
+          uri = await uploadImageStorage(data?.name, data?.memberCard);
+
+        const memberData: MemberDataWithId = {
+          ...data,
+          profileImageUri: uri,
+        };
+
+        let result;
+        if (isEdit) {
+          memberData.id = isEdit;
+          await repository.updateMember(memberData);
+          result = { id: isEdit };
+        } else {
+          await repository.createMember(memberData);
+          result = { id: `${data.name}-${data.memberCard}` };
+        }
+
+        if (data.birthDate) {
+          Promise.resolve().then(async () => {
+            try {
+              await createOrUpdateBirthdayEvent({
+                id: result.id,
+                name: data.name,
+                birthDate: data.birthDate,
+                gender: data.gender,
+                profileImage: uri,
+              });
+            } catch (error) {
+              Log.error("Erro ao criar evento de aniversário:", error);
+            }
+          });
+        }
+
+        return result;
+      } finally {
+        operationInProgress.current = false;
       }
     },
     onSuccess: () => {
       const action = isEdit ? "edit" : "create";
-      queryClient.invalidateQueries({
-        queryKey: ["members"],
-      });
-      console.log(
-        isEdit
-          ? "✅ Membro editado com sucesso!"
-          : "✅ Membro criado com sucesso!"
+
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["members"] }),
+        queryClient.invalidateQueries({ queryKey: ["birthDates"] }),
+        queryClient.invalidateQueries({ queryKey: ["dots"] }),
+      ]).catch(console.error);
+
+      Log.success(
+        isEdit ? "Membro editado com sucesso!" : "Membro criado com sucesso!"
       );
+
       goBack();
       setVisibleToast(true, action);
     },
-    onError: (erro) => console.error("[MutationRegister] ->", erro),
+    onError: (erro) => {
+      Log.error("[MutationRegister] ->", erro);
+      operationInProgress.current = false;
+    },
   });
 
-  const onSubmit = (dataForm: FormDataRegisterMember) => {
-    Keyboard.dismiss();
-    createMemberMutation.mutate(dataForm);
-  };
+  const onSubmit = useCallback(
+    (dataForm: FormDataRegisterMember) => {
+      Keyboard.dismiss();
+      createMemberMutation.mutate(dataForm);
+    },
+    [createMemberMutation]
+  );
+
+  const cleanupOnUnmount = useCallback(() => {
+    cleanup();
+    operationInProgress.current = false;
+  }, [cleanup]);
 
   return {
     onSubmit,
@@ -96,6 +154,8 @@ const useRegisterMember = ({ isEdit }: { isEdit: string }) => {
     openImagePickerAsync,
     profileImage,
     isLoading: createMemberMutation?.isPending,
+    isOperationInProgress: operationInProgress.current,
+    cleanupOnUnmount,
   };
 };
 
