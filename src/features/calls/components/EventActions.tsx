@@ -3,11 +3,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Button, Text } from "@components/index";
 import { colors } from "@styles/colors";
 import { Pen, Trash2 } from "lucide-react-native";
-import getHeight from "@utils/getHeight";
+import getHeight from "global/constants/height";
 import * as RN from "react-native";
 
 interface EventActionsProps {
-  event: any;
   loadingEventPreview: boolean;
   generatePDF: () => void;
   handleEditCall: () => void;
@@ -15,7 +14,6 @@ interface EventActionsProps {
 }
 
 const EventActions: React.FC<EventActionsProps> = ({
-  event,
   loadingEventPreview,
   generatePDF,
   handleEditCall,
@@ -27,11 +25,7 @@ const EventActions: React.FC<EventActionsProps> = ({
       activeLoading={loadingEventPreview}
       onPress={generatePDF}
     >
-      <MaterialIcons
-        name="picture-as-pdf"
-        color={colors.white}
-        size={22}
-      />
+      <MaterialIcons name="picture-as-pdf" color={colors.white} size={22} />
       <Text size={14} className="font-poppinsSemiBold text-white">
         Visualizar chamada
       </Text>

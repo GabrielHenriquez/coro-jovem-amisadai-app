@@ -2,6 +2,7 @@ import React from "react";
 import * as RN from "react-native";
 import { Text } from "@components/index";
 import { BirthDateShimmer } from "./EventCardShimmer";
+import ProfileImage from "@components/ProfileImage";
 
 interface BirthDatesListProps {
   getBirthDatesQuery: any;
@@ -14,11 +15,11 @@ const BirthDatesList: React.FC<BirthDatesListProps> = ({
 }) => {
   if (getBirthDatesQuery.isLoading) {
     return (
-      <RN.View className="gap-3">
+      <>
         {Array.from({ length: 1 }).map((_, index) => (
           <BirthDateShimmer key={index} />
         ))}
-      </RN.View>
+      </>
     );
   }
 
@@ -41,15 +42,17 @@ const BirthDatesList: React.FC<BirthDatesListProps> = ({
             />
 
             <RN.View className="flex-row items-center gap-3">
-              <RN.Image
-                style={{ width: 44, height: 44, borderRadius: 22 }}
-                source={{ uri: event?.profileImage }}
+              <ProfileImage
+                data={{ name: event?.name, uri: event?.profileImage }}
+                size={44}
               />
-              <RN.View className="gap-1">
+              <RN.View className="gap-0.5">
                 <Text className="font-poppinsSemiBold">
                   Aniversariante do dia! 🎉
                 </Text>
-                <Text className="font-poppins">{event?.name}</Text>
+                <Text size={15} className="font-poppinsMedium text-grayDark">
+                  {event?.name}
+                </Text>
               </RN.View>
             </RN.View>
           </RN.View>

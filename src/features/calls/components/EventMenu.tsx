@@ -4,7 +4,7 @@ import { Text, BaseBottomSheet } from "@components/index";
 import { colors } from "@styles/colors";
 import { Clock } from "lucide-react-native";
 import * as RN from "react-native";
-import { formatDateToBR } from "@features/members/utils/formatDate";
+import { formatDateToBR } from "@utils/date";
 import EventActions from "./EventActions";
 
 interface EventMenuProps {
@@ -39,13 +39,10 @@ const EventMenu: React.FC<EventMenuProps> = ({
           className="font-poppinsMedium text-grayDark text-center items-center"
         >
           <Feather size={16} name="book-open" color={colors.black} />
-          {"  "}
           Culto: {event?.cult}
         </Text>
 
-        <RN.View
-          style={{ gap: 8, flexDirection: "row", alignItems: "center" }}
-        >
+        <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
           <Clock size={16} color={colors.black} />
           <Text size={16} className="font-poppinsMedium  text-grayDark">
             Horário: {event?.hour}
@@ -54,7 +51,6 @@ const EventMenu: React.FC<EventMenuProps> = ({
       </RN.View>
 
       <EventActions
-        event={event}
         loadingEventPreview={loadingEventPreview}
         generatePDF={generatePDF}
         handleEditCall={handleEditCall}
