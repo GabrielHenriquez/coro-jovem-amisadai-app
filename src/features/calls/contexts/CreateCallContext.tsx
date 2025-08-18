@@ -7,21 +7,20 @@ import {
   useCallback,
 } from "react";
 import { FormProvider } from "react-hook-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import useFormCreateCall from "../hooks/forms/useFormCreateCall";
-import { useEventsQueries } from "../infra/queryAdapters/useEventsQueries";
-import { FirebaseMembersRepository } from "@features/members/domain/repositories/FirebaseMembersRepository";
-import { MembersUseCase } from "@features/members/domain/usecases/MembersUseCase";
+import { useEventsQueries } from "../hooks/useEventsQueries";
 import { IMember } from "@features/members/domain/entities/Member";
 import { IEvent, IEventCard } from "../domain/entities/Events";
-import { useAuthStore } from "@features/auth/presentation/stores/authStore";
+import { useAuthStore } from "@features/auth/stores/authStore";
 import { formatDateToUS } from "@utils/date";
 import { useNavigation } from "@react-navigation/native";
 import { useDebounce } from "use-debounce";
 import { Keyboard } from "react-native";
-import { useSongsQueries } from "../infra/queryAdapters/useSongsQueries";
+import { useSongsQueries } from "../hooks/useSongsQueries";
 import { ISong } from "../domain/entities/Songs";
 import { useToastStore } from "../stores/useToastStore";
+import { useMembers } from "@features/members/hooks";
 
 interface CreateCallFormData {
   hour: string;
@@ -81,17 +80,11 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
   const [songPressed, setSongPressed] = useState<ISong | null>(null);
   const [dataForm, setDataForm] = useState<CreateCallFormData | undefined>();
 
-  const membersUseCase = new MembersUseCase(new FirebaseMembersRepository());
   const formValidator = useFormCreateCall();
   const { mutate, isPending } = createEventMutation;
   const { getSongsQuery } = useSongsQueries();
-
   const { data: songsData = [] } = getSongsQuery;
-
-  const { data: membersData = [] } = useQuery({
-    queryKey: ["members"],
-    queryFn: () => membersUseCase.execute("getMembers"),
-  });
+  const { data: membersData = [] } = useMembers();
 
   const generateDotKey = useCallback(
     (type: string, date: string, numberSearchDoc: string) =>
@@ -261,12 +254,10 @@ export const CreateCallProvider = ({ children }: { children: ReactNode }) => {
     const searchTermLower = debouncedSearchTerm.toLowerCase();
 
     if (step === 2) {
-      // Filter songs
       return (dataList as ISong[]).filter((item: ISong) =>
         item?.music?.toLowerCase().includes(searchTermLower)
       );
     } else {
-      // Filter members
       return (dataList as IMember[]).filter((item: IMember) =>
         item?.name?.toLowerCase().includes(searchTermLower)
       );
