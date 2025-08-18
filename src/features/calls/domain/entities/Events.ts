@@ -22,7 +22,12 @@ export interface IEvent {
   local: string;
   components: Array<{ name: string; id: string; gender: string; suit: string }>;
   musics: ISong[];
-  missingComponents: Array<{ name: string; id: string; gender: string; suit: string }>;
+  missingComponents: Array<{
+    name: string;
+    id: string;
+    gender: string;
+    suit: string;
+  }>;
   numberSearchDoc: number;
 }
 
@@ -31,4 +36,16 @@ export interface IEventBirthDateCard {
   name: string;
   birthDate: string;
   [key: string]: any;
+}
+
+export interface IBirthdayEvent {
+  id: string;
+  memberId: string;
+  name: string;
+  birthDate: string;
+  gender: string;
+  profileImage: string;
+  year: number;
+  createdAt: number;
+  updatedAt: number;
 }
