@@ -16,8 +16,12 @@ import {
 import { colors } from "@styles/colors";
 import RootNavigator from "@navigation/index";
 import SplashScreen from "features/splash/SplashScreen";
-import { useAuthStore } from "@features/auth/presentation/stores/authStore";
+
 import useCheckForUpdate from "@hooks/useCheckForUpdate";
+import { getLoggerConfig } from "global/configs/logger";
+import { Log } from "@services/index";
+import { useBirthdaySync } from "@hooks/index";
+import { useAuthStore } from "@features/auth/stores/authStore";
 
 enum AppState {
   Loading,
@@ -45,14 +49,41 @@ export default function App() {
 
   const [appState, setAppState] = useState<AppState>(AppState.Loading);
 
+  useBirthdaySync({
+    delay: 2000,
+    autoSync: true,
+  });
+
   const initApp = () => {
-    setTimeout(() => setAppState(AppState.Main), 3000);
+    setTimeout(() => setAppState(AppState.Main), 2500);
     loadUserFromStorage();
     setBackgroundColorAsync(colors.background);
     setButtonStyleAsync("dark");
+
+    Log.success("Aplicação iniciada com sucesso!", {
+      environment: process.env.EXPO_PUBLIC_ENV,
+    });
   };
 
-  useEffect(() => initApp(), []);
+  const initializeNotificationServices = async () => {
+    try {
+      const { birthdayNotificationService } = await import("@services/index");
+      const success = await birthdayNotificationService.initialize();
+      if (success) Log.success("Serviços de notificação inicializados");
+    } catch (error) {
+      Log.error("Erro ao inicializar serviços de notificação:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const config = getLoggerConfig();
+    Log.configure(config);
+    initApp();
+
+    const timer = setTimeout(initializeNotificationServices, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const renderContent = () => {
     const stateComponents: Record<AppState, JSX.Element> = {
