@@ -6,8 +6,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import { colors, IColors } from "@styles/colors";
 import { forwardRef, ReactNode } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Pressable, StyleSheet } from "react-native";
 
 export interface BaseBottomSheetProps extends BottomSheetModalProps {
   children: ReactNode;
@@ -16,8 +15,10 @@ export interface BaseBottomSheetProps extends BottomSheetModalProps {
 }
 
 const BaseBottomSheet = forwardRef<BottomSheetModal, BaseBottomSheetProps>(
-  ({ children, indicatorColor, withMorePaddingBottom = true, ...props }, ref) => {
-    const { bottom } = useSafeAreaInsets();
+  (
+    { children, indicatorColor, withMorePaddingBottom = true, ...props },
+    ref
+  ) => {
     const { dismiss } = useBottomSheetModal();
     const paddingBottom = withMorePaddingBottom ? 30 : 0;
 
@@ -57,9 +58,7 @@ const BaseBottomSheet = forwardRef<BottomSheetModal, BaseBottomSheetProps>(
           height: 18,
         }}
       >
-        <BottomSheetView style={{ paddingBottom }}>
-          {children}
-        </BottomSheetView>
+        <BottomSheetView style={{ paddingBottom }}>{children}</BottomSheetView>
       </BottomSheetModal>
     );
   }

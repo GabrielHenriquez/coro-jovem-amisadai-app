@@ -25,7 +25,7 @@ const HeaderWithMenu = ({ styleRest }: { styleRest?: RN.ViewStyle }) => {
         <Menu size={36} color="#FFF" />
       </RN.TouchableOpacity>
 
-      <LogoAmisadai width={140} height={70} />
+      <LogoAmisadai width={140} height={70} style={{marginBottom: 5}} />
     </RN.View>
   );
 };
