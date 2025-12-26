@@ -6,42 +6,36 @@ import { useNavigation } from "@react-navigation/native";
 import { Button, Header, Text } from "@components/index";
 import * as Components from "../components";
 import * as Hooks from "../hooks";
-import useFormReport from "../hooks/forms/useFormReport";
+import useFormAnnualReport from "../hooks/forms/useFormAnnualReport";
 import CallsStyles from "../styles/CallsStyles";
 import { colors } from "@styles/colors";
 
 type ReportType = "faltas" | "presenças";
 
-const ReportsScreen: React.FC = () => {
+const AnnualReportsScreen: React.FC = () => {
   const navigation = useNavigation();
   const missingComponentsPdfModalRef = useRef<BottomSheetModal | null>(null);
   const presenceComponentsPdfModalRef = useRef<BottomSheetModal | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [reportType, setReportType] = useState<ReportType>("faltas");
 
-  const { control, handleSubmit, errors } = useFormReport();
+  const { control, handleSubmit, errors } = useFormAnnualReport();
 
   const {
-    months,
+    availableYears,
     currentYear,
-    selectedMonth,
-    eventsByMonth,
+    selectedYear,
+    eventsByYear,
     missingComponentsPdfUri,
     loadingMissingComponentsPdf,
-    hasEventsForMonth,
+    hasEventsForYear,
     handleGenerateReport,
     handleShareReport,
     handleClearReport,
-  } = Hooks.useReportManager({
+  } = Hooks.useAnnualReportManager({
     modalRef: missingComponentsPdfModalRef,
     control,
   });
-
-  const formattedMonth = useMemo(() => {
-    if (!selectedMonth) return "";
-    const monthObj = months.find((m) => m.value === selectedMonth);
-    return monthObj ? `${monthObj.label} ${currentYear}` : "";
-  }, [selectedMonth, months, currentYear]);
 
   const {
     pdfUri: presenceComponentsPdfUri,
@@ -49,15 +43,15 @@ const ReportsScreen: React.FC = () => {
     generatePresenceComponentsPDF,
     sharePDF: sharePresenceComponentsPdf,
     clearPdfUri: clearPresenceComponentsPdfUri,
-  } = Hooks.usePresenceComponentsPdfManager({
-    eventIds: eventsByMonth || [],
-    currentMonth: formattedMonth,
+  } = Hooks.useAnnualPresenceComponentsPdfManager({
+    eventIds: eventsByYear || [],
+    currentYear: selectedYear,
     modalRef: presenceComponentsPdfModalRef,
   });
 
   useEffect(() => {
     setRefreshKey((prev) => prev + 1);
-  }, [selectedMonth]);
+  }, [selectedYear]);
 
   const handleGeneratePresenceReport = async () => {
     await generatePresenceComponentsPDF();
@@ -97,16 +91,16 @@ const ReportsScreen: React.FC = () => {
         bgColor="primary"
         onPressBack={() => navigation.goBack()}
         color="white"
-        title="Relatórios Mensais"
+        title="Relatório Anual"
       />
 
       <RNView className="gap-4 px-5 mt-6">
         <RNView className="gap-3">
           <Text size={22} className="font-poppinsBold text-black text-center">
-            Relatórios Mensais
+            Relatório Anual
           </Text>
           <Text className="font-poppinsRegular text-gray-500 text-center">
-            Analise a frequência por período
+            Analise a frequência total do ano
           </Text>
         </RNView>
 
@@ -159,30 +153,30 @@ const ReportsScreen: React.FC = () => {
           </TouchableOpacity>
         </RNView>
 
-        <Components.PeriodSelector
-          months={months}
-          currentYear={currentYear}
+        <Components.YearSelector
+          years={availableYears}
           control={control}
           errors={errors}
         />
 
-        {selectedMonth && (
+        {selectedYear && (
           <Components.EventStatusCard
             key={refreshKey}
-            eventsByMonth={eventsByMonth}
+            eventsByYear={eventsByYear}
+            year={selectedYear}
           />
         )}
 
         <RNView style={{ marginTop: 5 }}>
           <Button
             onPress={handleSubmit(currentHandleGenerate)}
-            disabled={!selectedMonth || currentLoading || !hasEventsForMonth}
+            disabled={!selectedYear || currentLoading || !hasEventsForYear}
             activeLoading={currentLoading}
           >
             <Text className="font-poppinsSemiBold text-white">
               {currentLoading
                 ? "Gerando Relatório..."
-                : `Gerar Relatório de ${reportType === "faltas" ? "Faltas" : "Presenças"}`}
+                : `Gerar Relatório Anual de ${reportType === "faltas" ? "Faltas" : "Presenças"}`}
             </Text>
           </Button>
         </RNView>
@@ -207,4 +201,5 @@ const ReportsScreen: React.FC = () => {
   );
 };
 
-export default ReportsScreen;
+export default AnnualReportsScreen;
+

@@ -26,6 +26,7 @@ export interface IDropdownValues {
   callType?: CallValue | null;
   office?: OfficeValue | null;
   month?: string | null;
+  year?: string | null;
 }
 
 interface IProps<T extends keyof IDropdownValues> {

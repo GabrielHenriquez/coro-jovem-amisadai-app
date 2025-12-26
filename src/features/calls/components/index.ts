@@ -18,3 +18,4 @@ export { default as MissingComponentsPdfModal } from "./MissingComponentsPdfModa
 export { default as PresenceComponentsPdfModal } from "./PresenceComponentsPdfModal";
 export { default as EventStatusCard } from "./EventStatusCard";
 export { default as PeriodSelector } from "./PeriodSelector";
+export { default as YearSelector } from "./YearSelector";

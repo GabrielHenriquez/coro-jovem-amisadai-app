@@ -4,11 +4,20 @@ import { Text } from "@components/index";
 import { reportStyles } from "../styles/ReportStyles";
 
 interface EventStatusCardProps {
-  eventsByMonth: any[] | undefined;
+  eventsByMonth?: any[] | undefined;
+  eventsByYear?: any[] | undefined;
+  year?: string;
 }
 
-const EventStatusCard: React.FC<EventStatusCardProps> = ({ eventsByMonth }) => {
-  if (eventsByMonth === undefined) {
+const EventStatusCard: React.FC<EventStatusCardProps> = ({
+  eventsByMonth,
+  eventsByYear,
+  year,
+}) => {
+  const events = eventsByYear || eventsByMonth;
+  const isAnnual = eventsByYear !== undefined;
+
+  if (events === undefined) {
     return (
       <RNView style={[reportStyles.statusCard, reportStyles.statusCardLoading]}>
         <RNView style={reportStyles.statusContent}>
@@ -23,7 +32,7 @@ const EventStatusCard: React.FC<EventStatusCardProps> = ({ eventsByMonth }) => {
     );
   }
 
-  if (eventsByMonth.length > 0) {
+  if (events.length > 0) {
     return (
       <RNView style={[reportStyles.statusCard, reportStyles.statusCardSuccess]}>
         <RNView style={reportStyles.statusContent}>
@@ -31,7 +40,9 @@ const EventStatusCard: React.FC<EventStatusCardProps> = ({ eventsByMonth }) => {
             style={[reportStyles.statusDot, reportStyles.statusDotSuccess]}
           />
           <Text size={15} className="font-poppinsMedium text-greenDark">
-            {eventsByMonth.length} chamadas encontradas para este mês
+            {isAnnual
+              ? `${events.length} chamadas encontradas para ${year}`
+              : `${events.length} chamadas encontradas para este mês`}
           </Text>
         </RNView>
       </RNView>
@@ -45,7 +56,9 @@ const EventStatusCard: React.FC<EventStatusCardProps> = ({ eventsByMonth }) => {
           style={[reportStyles.statusDot, reportStyles.statusDotWarning]}
         />
         <Text size={14} className="font-poppinsMedium text-gray-500">
-          Nenhuma chamada encontrada para este mês
+          {isAnnual
+            ? `Nenhuma chamada encontrada para ${year}`
+            : "Nenhuma chamada encontrada para este mês"}
         </Text>
       </RNView>
     </RNView>

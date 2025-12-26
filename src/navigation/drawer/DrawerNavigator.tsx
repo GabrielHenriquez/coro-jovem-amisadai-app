@@ -9,6 +9,7 @@ import MembersStack, {
 import { CallStackParamList } from "@features/calls/navigation/CallsStack";
 import CallsStack from "@features/calls/navigation/CallsStack";
 import ReportsScreen from "@features/calls/screens/ReportsScreen";
+import AnnualReportsScreen from "@features/calls/screens/AnnualReportsScreen";
 
 const Drawer = createDrawerNavigator();
 const { width } = Dimensions.get("window");
@@ -18,6 +19,7 @@ export type DrawerParamList = {
   CallsNavigation: NavigatorScreenParams<CallStackParamList>;
   MembersNavigation: NavigatorScreenParams<MembersStackParamList>;
   Reports: undefined;
+  AnnualReports: undefined;
 };
 
 export default function DrawerNavigator() {
@@ -36,6 +38,7 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="CallsNavigation" component={CallsStack} />
       <Drawer.Screen name="MembersNavigation" component={MembersStack} />
       <Drawer.Screen name="Reports" component={ReportsScreen} />
+      <Drawer.Screen name="AnnualReports" component={AnnualReportsScreen} />
     </Drawer.Navigator>
   );
 }

@@ -44,6 +44,15 @@ export const generateCallPdfFileName = (event: {
   return `Chamada_CJA${typePart}${cultPart}_${formattedDate}.pdf`;
 };
 
+export const generateAnnualReportPdfFileName = (
+  reportType: "faltas" | "presenças",
+  year: string
+): string => {
+  const type = reportType === "faltas" ? "Faltas" : "Presencas";
+
+  return `Relatorio_Anual_${type}_${year}.pdf`;
+};
+
 export const sanitizeFileName = (fileName: string): string => {
   return fileName
     .replace(/[<>:"/\\|?*]/g, "_")

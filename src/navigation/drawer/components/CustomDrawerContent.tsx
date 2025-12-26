@@ -18,6 +18,10 @@ export default function CustomDrawerContent(
     props.navigation.navigate("Reports" as never);
   };
 
+  const handleAnnualReportsPress = () => {
+    props.navigation.navigate("AnnualReports" as never);
+  };
+
   return (
     <DrawerContentScrollView
       {...props}
@@ -47,7 +51,19 @@ export default function CustomDrawerContent(
             onPress={handleReportsPress}
           >
             <Text size={16} className="text-white font-poppinsSemiBold">
-              Relatórios
+              Relatórios Mensais
+            </Text>
+
+            <FileText size={20} color={colors.white} />
+          </Button>
+
+          <Button
+            bgColor="primary"
+            styleRest={{ height: 38 }}
+            onPress={handleAnnualReportsPress}
+          >
+            <Text size={16} className="text-white font-poppinsSemiBold">
+              Relatório Anual
             </Text>
 
             <FileText size={20} color={colors.white} />
