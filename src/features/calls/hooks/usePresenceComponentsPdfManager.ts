@@ -9,6 +9,8 @@ import { IEvent } from "../domain/entities/Events";
 import { Log } from "@services/Logger";
 import { useEventsQueries } from "./useEventsQueries";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { generateReportPdfFileName } from "../utils/pdfFileNameGenerator";
+import { renamePdfFile } from "../utils/renamePdfFile";
 
 interface UsePresenceComponentsPdfManagerProps {
   eventIds: string[];
@@ -175,7 +177,10 @@ export const usePresenceComponentsPdfManager = ({
       };
 
       if (!presenceComponentsData.month || !presenceComponentsData.year) {
-        Log.error("Dados inválidos para geração do PDF", presenceComponentsData);
+        Log.error(
+          "Dados inválidos para geração do PDF",
+          presenceComponentsData
+        );
         return;
       }
 
@@ -184,9 +189,25 @@ export const usePresenceComponentsPdfManager = ({
           html: presenceComponentsHtmlContent(presenceComponentsData),
         });
 
-        Log.info("PDF gerado com sucesso, definindo URI", { uri });
-        setPdfUri(uri);
-        Log.success("PDF de frequência de presenças gerado com sucesso", { uri });
+        Log.info("PDF gerado com sucesso, renomeando arquivo", { uri });
+
+        const fileName = generateReportPdfFileName("presenças", month, year);
+        const renamedUri = await renamePdfFile(uri, fileName);
+
+        if (renamedUri) {
+          setPdfUri(renamedUri);
+          Log.success(
+            "PDF de frequência de presenças gerado e renomeado com sucesso",
+            {
+              uri: renamedUri,
+            }
+          );
+        } else {
+          setPdfUri(uri);
+          Log.success("PDF de frequência de presenças gerado com sucesso", {
+            uri,
+          });
+        }
       } catch (error) {
         Log.error("Erro ao gerar PDF de frequência de presenças:", error);
       } finally {
@@ -219,4 +240,3 @@ export const usePresenceComponentsPdfManager = ({
     clearPdfUri,
   };
 };
-

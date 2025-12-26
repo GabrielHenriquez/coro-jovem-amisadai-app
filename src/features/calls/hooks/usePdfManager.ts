@@ -3,6 +3,8 @@ import * as Print from "expo-print";
 import * as Share from "expo-sharing";
 import htmlContent from "../utils/htmlContent";
 import { Log } from "@services/Logger";
+import { generateCallPdfFileName } from "../utils/pdfFileNameGenerator";
+import { renamePdfFile } from "../utils/renamePdfFile";
 
 interface UsePdfManagerProps {
   event: any;
@@ -21,7 +23,21 @@ export const usePdfManager = ({ event, validate }: UsePdfManagerProps) => {
       const { uri } = await Print.printToFileAsync({
         html: htmlContent(event),
       });
-      setPdfUri(uri);
+
+      Log.info("PDF gerado com sucesso, renomeando arquivo", { uri });
+
+      const fileName = generateCallPdfFileName(event);
+      const renamedUri = await renamePdfFile(uri, fileName);
+
+      if (renamedUri) {
+        setPdfUri(renamedUri);
+        Log.success("PDF de chamada gerado e renomeado com sucesso", {
+          uri: renamedUri,
+        });
+      } else {
+        setPdfUri(uri);
+        Log.success("PDF de chamada gerado com sucesso", { uri });
+      }
     } catch (error) {
       Log.error("Error generating PDF:", error);
     } finally {

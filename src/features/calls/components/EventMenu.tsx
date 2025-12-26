@@ -34,13 +34,12 @@ const EventMenu: React.FC<EventMenuProps> = ({
           Chamada - CJA ({formatDateToBR(event?.date!)})
         </Text>
 
-        <Text
-          size={16}
-          className="font-poppinsMedium text-grayDark text-center items-center"
-        >
+        <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
           <Feather size={16} name="book-open" color={colors.black} />
-          Culto: {event?.cult}
-        </Text>
+          <Text size={16} className="font-poppinsMedium  text-grayDark">
+            Culto: {event?.cult}
+          </Text>
+        </RN.View>
 
         <RN.View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
           <Clock size={16} color={colors.black} />
