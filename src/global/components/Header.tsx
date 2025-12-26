@@ -28,15 +28,12 @@ export const Header = ({
 
   return (
     <>
-      {/* Status bar no mesmo tom do header */}
       <StatusBar backgroundColor={bgColor} barStyle="light-content" />
 
-      {/* Container principal */}
       <RN.View
         className="flex-row items-center justify-between px-4 py-4"
         style={{ backgroundColor: colors[bgColor] }}
       >
-        {/* Lado ESQUERDO – botão de voltar */}
         <RN.TouchableOpacity
           onPress={onPressBack}
           className="w-10 items-center justify-center"
@@ -44,7 +41,6 @@ export const Header = ({
           <ChevronLeft size={36} color={iconColor} />
         </RN.TouchableOpacity>
 
-        {/* CENTRO – título */}
         {title && (
           <Text
             size={20}
@@ -56,7 +52,6 @@ export const Header = ({
           </Text>
         )}
 
-        {/* Lado DIREITO – botão secundário OU placeholder para manter o centro perfeito */}
         {hasButtonSecondary ? (
           <RN.TouchableOpacity
             onPress={onPressSecondary}
@@ -65,7 +60,7 @@ export const Header = ({
             {icon}
           </RN.TouchableOpacity>
         ) : (
-          <RN.View className="w-10" /> // placeholder invisível
+          <RN.View className="w-10" />
         )}
       </RN.View>
     </>

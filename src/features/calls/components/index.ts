@@ -15,5 +15,6 @@ export { default as PdfPreviewModal } from "./PdfPreviewModal";
 export { default as DeleteConfirmationModal } from "./DeleteConfirmationModal";
 export { default as MissingComponentsPdfButton } from "./MissingComponentsPdfButton";
 export { default as MissingComponentsPdfModal } from "./MissingComponentsPdfModal";
+export { default as PresenceComponentsPdfModal } from "./PresenceComponentsPdfModal";
 export { default as EventStatusCard } from "./EventStatusCard";
 export { default as PeriodSelector } from "./PeriodSelector";
